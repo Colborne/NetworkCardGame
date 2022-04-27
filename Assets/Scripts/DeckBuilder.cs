@@ -6,19 +6,16 @@ using UnityEngine.UI;
 
 public class DeckBuilder : MonoBehaviour
 {
-    public List<Card> Deck;
     public TMP_Text DeckSize;
     public Button[] cards;
 
-    private void Awake() {
-        Deck = new List<Card>();
-    }
+
 
     private void Update() 
     {
         int Temp = 0;
         for(int i = 0; i < cards.Length; i++)
-            Temp += int.Parse(cards[i].GetComponent<CardHolder>().amount.text);
+            Temp += int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text);
         
         if(Temp.ToString() != DeckSize.text)
             DeckSize.text = "Deck Size: " + Temp.ToString();
@@ -37,7 +34,7 @@ public class DeckBuilder : MonoBehaviour
         {
             for(int j = 0; j < int.Parse(cards[i].GetComponent<CardHolder>().amount.text); j++)
             {
-                Deck.Add(cards[i].GetComponent<CardHolder>().card);
+                //Deck.Add(cards[i].GetComponent<CardHolder>().card);
             }
         }
     }
