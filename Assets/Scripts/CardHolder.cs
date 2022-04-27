@@ -6,9 +6,7 @@ using TMPro;
 
 public class CardHolder : MonoBehaviour
 {
-    public Card card;
-    public TMP_Text amount;
-
+    public ScriptableCard card;
     private void Start() {
         GetComponent<Button>().image.sprite = card.portrait;
     }

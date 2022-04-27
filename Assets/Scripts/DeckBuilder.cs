@@ -8,9 +8,11 @@ public class DeckBuilder : MonoBehaviour
 {
     public TMP_Text DeckSize;
     public Button[] cards;
+    public List<CardInfo> Deck;
 
-
-
+    private void Awake() {
+        Deck = new List<CardInfo>();
+    }
     private void Update() 
     {
         int Temp = 0;
@@ -32,9 +34,9 @@ public class DeckBuilder : MonoBehaviour
     {
         for(int i = 0; i < cards.Length; i++)
         {
-            for(int j = 0; j < int.Parse(cards[i].GetComponent<CardHolder>().amount.text); j++)
+            for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
             {
-                //Deck.Add(cards[i].GetComponent<CardHolder>().card);
+                Deck.Add(new CardInfo(cards[i].GetComponent<CardHolder>().card));
             }
         }
     }

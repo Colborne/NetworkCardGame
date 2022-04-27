@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a02dea53d35dbc5418162dbca99c526c, type: 3}
+  m_Name: Crab With Knife
+  m_EditorClassIdentifier: 
+  cardID: 32
+  title: Crab With Knife
+  spr: 3
+  portrait: {fileID: 918423874, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
