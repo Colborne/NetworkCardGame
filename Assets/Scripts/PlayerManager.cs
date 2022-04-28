@@ -36,7 +36,7 @@ public class PlayerManager : NetworkBehaviour
     [SyncVar(hook = nameof(UpdatePlayerName))] public string username;
     [SyncVar] public int hp;
     [SyncVar] public int sp;
-    [SyncVar(hook = nameof(UpdateDeck))] public int deckSize;
+    [SyncVar] public int deckSize;
     public PlayerInfo enemy;
     public static PlayerManager localPlayer;
     public GameObject playerField;
@@ -55,11 +55,6 @@ public class PlayerManager : NetworkBehaviour
         hp = health;
         sp = sum;
         deckSize = deck;
-    }
-
-    void UpdateDeck(int oldv, int newv)
-    {
-        deckSize = newv;
     }
 
     void UpdatePlayerName(string oldUser, string newUser)
@@ -100,32 +95,33 @@ public class PlayerManager : NetworkBehaviour
         for(int i = 0; i < deckBuilder.Deck.Count; i++)
             deck.Enqueue(new CardInfo(deckBuilder.Deck[i]));  
 
+        deckSize = deck.Count;
         //for(int i = 0; i < hand.Length; i++)
             //hand[i] = deck.Dequeue();    
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdUpdatePlayerText()
+    [Command]
+    public void CmdUpdatePlayerText(string u, int h, int s, int d)
     {
-        RpcUpdatePlayerText();
+        RpcUpdatePlayerText(u,h,s,d);
     }
 
     [ClientRpc]
-    public void RpcUpdatePlayerText()
+    public void RpcUpdatePlayerText(string u, int h, int s, int d)
     {
         if(hasAuthority)
         {
-            playerField.transform.GetChild(0).GetComponent<TMP_Text>().text = username;
-            playerField.transform.GetChild(1).GetComponent<TMP_Text>().text = hp.ToString();
-            playerField.transform.GetChild(2).GetComponent<TMP_Text>().text = sp.ToString();
-            playerField.transform.GetChild(3).GetComponent<TMP_Text>().text = deckSize.ToString();
+            playerField.transform.GetChild(0).GetComponent<TMP_Text>().text = u;
+            playerField.transform.GetChild(1).GetComponent<TMP_Text>().text = h.ToString();
+            playerField.transform.GetChild(2).GetComponent<TMP_Text>().text = s.ToString();
+            playerField.transform.GetChild(3).GetComponent<TMP_Text>().text = d.ToString();
         }
         else
         {
-            enemyField.transform.GetChild(0).GetComponent<TMP_Text>().text = username;
-            enemyField.transform.GetChild(1).GetComponent<TMP_Text>().text = hp.ToString();
-            enemyField.transform.GetChild(2).GetComponent<TMP_Text>().text = sp.ToString();
-            enemyField.transform.GetChild(3).GetComponent<TMP_Text>().text = deckSize.ToString();
+            enemyField.transform.GetChild(0).GetComponent<TMP_Text>().text = u;
+            enemyField.transform.GetChild(1).GetComponent<TMP_Text>().text = h.ToString();
+            enemyField.transform.GetChild(2).GetComponent<TMP_Text>().text = s.ToString();
+            enemyField.transform.GetChild(3).GetComponent<TMP_Text>().text = d.ToString();
         }
     }
 
@@ -135,7 +131,8 @@ public class PlayerManager : NetworkBehaviour
         {
             UpdateEnemyInfo();
         }     
-        CmdUpdatePlayerText();
+        deckSize = deck.Count; 
+        CmdUpdatePlayerText(username,hp,sp,deckSize); 
     }
 
     public void UpdateEnemyInfo()
@@ -165,8 +162,6 @@ public class PlayerManager : NetworkBehaviour
         fc.portrait = card.image;
         bc.GetComponent<Image>().sprite = fc.portrait;
         NetworkServer.Spawn(bc);
-        deckSize = deck.Count; 
-        CmdUpdatePlayerText();
 
         if(isServer) RpcDisplayCard(bc, index);
     }
