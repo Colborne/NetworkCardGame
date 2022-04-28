@@ -6,7 +6,7 @@ using UnityEngine.UI;
 using Mirror;
 using TMPro;
 
-[SerializeField]
+[Serializable]
 public struct PlayerInfo
 {
     GameObject player;
@@ -37,14 +37,14 @@ public class PlayerManager : NetworkBehaviour
     [SyncVar] public int hp;
     [SyncVar] public int sp;
     [SyncVar] public int deckSize;
-    public PlayerInfo enemy;
+    public PlayerManager enemy;
     public static PlayerManager localPlayer;
     public GameObject playerField;
     public GameObject enemyField;
     public GameObject cardToSpawn;
     public bool hasEnemy;
     public Queue<CardInfo> deck;
-    public CardInfo[] hand;
+    [SerializeField] public CardInfo[] hand;
     public CardInfo[] field;
     DeckBuilder deckBuilder;
     
@@ -145,7 +145,7 @@ public class PlayerManager : NetworkBehaviour
         {
             if (players != this)
             {   
-                enemy = new PlayerInfo(players.gameObject);
+                enemy = players;
                 hasEnemy = true;
             }
         }
@@ -161,9 +161,16 @@ public class PlayerManager : NetworkBehaviour
         fc.spr = card.spr;
         fc.portrait = card.image;
         bc.GetComponent<Image>().sprite = fc.portrait;
+        hand[index] = fc.cardData;
         NetworkServer.Spawn(bc);
 
         if(isServer) RpcDisplayCard(bc, index);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdAttack(PlayerManager player, PlayerManager enemy)
+    {
+        enemy.hp -= player.hand[0].spr;
     }
 
     [ClientRpc]
