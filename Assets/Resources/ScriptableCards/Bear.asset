@@ -16,3 +16,6 @@ MonoBehaviour:
   title: Bear
   spr: 4
   portrait: {fileID: -192802867, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 0000000002000000000000000200000000000000
+  ability: 1
+  phase: 0

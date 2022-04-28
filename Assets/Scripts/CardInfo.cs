@@ -21,4 +21,7 @@ public struct CardInfo
     public Sprite image => data.portrait;
     public string title => data.title;
     public int spr => data.spr;
+    public int[] attackPattern => data.attackPattern;
+    public int ability => (int)data.ability;
+    public int phase => (int)data.phase;
 }

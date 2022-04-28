@@ -10,12 +10,19 @@ public class GameManager : MonoBehaviour
     public void PlayCard()
     {
         player = PlayerManager.localPlayer;
-        player.CmdPlayCard(player.deck.Dequeue(),0);
+        player.CmdPlayCard(player.deck.Dequeue(),2);
     }
 
     public void DealDamage()
     {
         player = PlayerManager.localPlayer;
-        player.CmdAttack(player, player.enemy);
+        for(int i = 0; i < player.field.Length; i++)
+        {
+            if(player.field[i] != null)
+            {
+                Debug.Log(i);
+                player.field[i].CmdDamage(player, player.enemy);
+            }              
+        }       
     }
 }

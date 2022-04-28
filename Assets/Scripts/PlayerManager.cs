@@ -45,7 +45,7 @@ public class PlayerManager : NetworkBehaviour
     public bool hasEnemy;
     public Queue<CardInfo> deck;
     [SerializeField] public CardInfo[] hand;
-    public CardInfo[] field;
+    public FieldCard[] field;
     DeckBuilder deckBuilder;
     
     [Command]
@@ -90,7 +90,7 @@ public class PlayerManager : NetworkBehaviour
     {
         deck = new Queue<CardInfo>();
         hand = new CardInfo[3];
-        field = new CardInfo[5];
+        field = new FieldCard[5];
 
         for(int i = 0; i < deckBuilder.Deck.Count; i++)
             deck.Enqueue(new CardInfo(deckBuilder.Deck[i]));  
@@ -160,17 +160,15 @@ public class PlayerManager : NetworkBehaviour
         fc.title = card.title;
         fc.spr = card.spr;
         fc.portrait = card.image;
+        fc.attackPattern = card.attackPattern;
+        fc.ability = (FieldCard.Ability)card.ability;
+        fc.phase = (FieldCard.Phase)card.phase;
+        fc.cardPosition = index;
         bc.GetComponent<Image>().sprite = fc.portrait;
-        hand[index] = fc.cardData;
+        field[index] = fc;
         NetworkServer.Spawn(bc);
 
         if(isServer) RpcDisplayCard(bc, index);
-    }
-
-    [Command(requiresAuthority = false)]
-    public void CmdAttack(PlayerManager player, PlayerManager enemy)
-    {
-        enemy.hp -= player.hand[0].spr;
     }
 
     [ClientRpc]
