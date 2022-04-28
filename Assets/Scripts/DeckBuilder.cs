@@ -8,10 +8,10 @@ public class DeckBuilder : MonoBehaviour
 {
     public TMP_Text DeckSize;
     public Button[] cards;
-    public List<CardInfo> Deck;
+    public List<ScriptableCard> Deck;
 
     private void Awake() {
-        Deck = new List<CardInfo>();
+        Deck = new List<ScriptableCard>();
     }
     private void Update() 
     {
@@ -36,8 +36,14 @@ public class DeckBuilder : MonoBehaviour
         {
             for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
             {
-                Deck.Add(new CardInfo(cards[i].GetComponent<CardHolder>().card));
+                Deck.Add(cards[i].GetComponent<CardHolder>().card);
             }
         }
+    }
+
+    public void CloseCanvas()
+    {
+        BuildDeck();
+        GetComponent<Canvas>().enabled = false;
     }
 }

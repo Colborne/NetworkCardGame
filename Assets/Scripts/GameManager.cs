@@ -10,6 +10,6 @@ public class GameManager : MonoBehaviour
     public void PlayCard()
     {
         player = PlayerManager.localPlayer;
-        player.CmdPlayCard(player.hand, 1);
+        player.CmdPlayCard(player.deck.Dequeue(),0);
     }
 }
