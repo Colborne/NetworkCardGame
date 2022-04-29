@@ -23,5 +23,4 @@ public struct CardInfo
     public int spr => data.spr;
     public int[] attackPattern => data.attackPattern;
     public int ability => (int)data.ability;
-    public int phase => (int)data.phase;
 }

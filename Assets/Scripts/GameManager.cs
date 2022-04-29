@@ -6,7 +6,8 @@ using Mirror;
 public class GameManager : MonoBehaviour
 {
     public PlayerManager player;
-    
+    bool started = false;
+ 
     public void PlayCard()
     {
         player = PlayerManager.localPlayer;

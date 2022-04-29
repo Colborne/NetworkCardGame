@@ -64,8 +64,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  username: 
+  hp: 0
+  sp: 0
+  deckSize: 0
+  enemy: {fileID: 0}
   playerField: {fileID: 0}
   enemyField: {fileID: 0}
+  cardToDraw: {fileID: 5026379625368372480, guid: c7333e764bebad643b9520472841f4a7, type: 3}
   cardToSpawn: {fileID: 5026379625368372480, guid: 37a0296e0f1ae5e4082466a18c0856b2, type: 3}
   hasEnemy: 0
-  handCard: {fileID: 11400000, guid: 664092c8a8d8d4e4c9e32969b319cc56, type: 2}
+  hand: []
+  field: []

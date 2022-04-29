@@ -41,7 +41,6 @@ public class FieldCard : NetworkBehaviour
     public int[] attackPattern;
     public int cardPosition;
     public Ability ability;
-    public Phase phase;
     public GameObject effect;
 
     public void Update()
@@ -133,7 +132,7 @@ public class FieldCard : NetworkBehaviour
             case Ability.ClearBoard:
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    player.hand[i] = new CardInfo();
+                    player.hand[i] = null;
                     EffectSpawnSelected(player, true, i);
                 }
                 
@@ -145,7 +144,7 @@ public class FieldCard : NetworkBehaviour
                 
                 for(int i = 0; i < target.hand.Length; i++)
                 {
-                    target.hand[i] = new CardInfo();
+                    target.hand[i] = null;
                     EffectSpawnSelected(target, true, i);
                 }
                 
@@ -161,7 +160,7 @@ public class FieldCard : NetworkBehaviour
                 if(rand == 0)
                 {
                     rand = Random.Range(0, player.hand.Length);
-                    player.hand[rand] = new CardInfo();
+                    player.hand[rand] = null;
                     EffectSpawnSelected(player, true, rand);
                 }
                 else if(rand == 1)
@@ -173,7 +172,7 @@ public class FieldCard : NetworkBehaviour
                 else if(rand == 2)
                 {
                     rand = Random.Range(0, target.hand.Length);
-                    target.hand[rand] = new CardInfo();
+                    target.hand[rand] = null;
                     EffectSpawnSelected(target, true, rand);
                 }
                 else if(rand == 3)

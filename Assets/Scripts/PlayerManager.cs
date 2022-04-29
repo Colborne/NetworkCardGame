@@ -41,11 +41,12 @@ public class PlayerManager : NetworkBehaviour
     public static PlayerManager localPlayer;
     public GameObject playerField;
     public GameObject enemyField;
+    public GameObject cardToDraw;
     public GameObject cardToSpawn;
     public bool hasEnemy;
-    public Queue<CardInfo> deck;
-    [SerializeField] public CardInfo[] hand;
-    public FieldCard[] field;
+    [SerializeField] public Queue<CardInfo> deck;
+    [SerializeField] public HandCard[] hand;
+    [SerializeField] public FieldCard[] field;
     DeckBuilder deckBuilder;
     
     [Command]
@@ -89,15 +90,16 @@ public class PlayerManager : NetworkBehaviour
     public void InstantiatePlayer()
     {
         deck = new Queue<CardInfo>();
-        hand = new CardInfo[3];
+        hand = new HandCard[5];
         field = new FieldCard[5];
 
         for(int i = 0; i < deckBuilder.Deck.Count; i++)
             deck.Enqueue(new CardInfo(deckBuilder.Deck[i]));  
 
-        deckSize = deck.Count;
-        //for(int i = 0; i < hand.Length; i++)
-            //hand[i] = deck.Dequeue();    
+        deckSize = deck.Count; 
+
+        for(int i = 0; i < 3; i++)
+            CmdAddCard(deck.Dequeue(), i); 
     }
 
     [Command]
@@ -128,25 +130,34 @@ public class PlayerManager : NetworkBehaviour
     private void Update() 
     {
         if(!hasEnemy)
-        {
             UpdateEnemyInfo();
-        }     
+
         deckSize = deck.Count; 
         CmdUpdatePlayerText(username,hp,sp,deckSize); 
     }
 
     public void UpdateEnemyInfo()
     {
-        // Find all Players and add them to the list.
         PlayerManager[] onlinePlayers = FindObjectsOfType<PlayerManager>();
-
-        // Loop through all online Players (should just be one other Player)
         foreach (PlayerManager players in onlinePlayers)
         {
             if (players != this)
             {   
                 enemy = players;
                 hasEnemy = true;
+
+                if(!isServer)
+                {
+                    HandCard[] cards = FindObjectsOfType<HandCard>();
+
+                    for(int i = 0; i < cards.Length; i++)
+                    {
+                        enemy.hand[i] = cards[i];
+                        cards[i].transform.SetParent(enemyField.transform.GetChild(5).GetChild(i), false);
+                        cards[i].cardPosition = i;
+                        cards[i].GetComponent<Image>().sprite = cards[i].GetComponent<HandCard>().CardBack;
+                    }
+                }
             }
         }
     }
@@ -162,7 +173,6 @@ public class PlayerManager : NetworkBehaviour
         fc.portrait = card.image;
         fc.attackPattern = card.attackPattern;
         fc.ability = (FieldCard.Ability)card.ability;
-        fc.phase = (FieldCard.Phase)card.phase;
         fc.cardPosition = index;
         bc.GetComponent<Image>().sprite = fc.portrait;
         field[index] = fc;
@@ -178,5 +188,56 @@ public class PlayerManager : NetworkBehaviour
             card.transform.SetParent(playerField.transform.GetChild(4).GetChild(index), false);
         else
             card.transform.SetParent(enemyField.transform.GetChild(4).GetChild(index), false);
+    }
+
+    [ClientRpc]
+    public void RpcDisplayHand(GameObject card, int index)
+    {
+        if(hasAuthority)
+            card.transform.SetParent(playerField.transform.GetChild(5).GetChild(index), false);
+        else
+        {
+            card.transform.SetParent(enemyField.transform.GetChild(5).GetChild(index), false);
+            card.GetComponent<Image>().sprite = card.GetComponent<HandCard>().CardBack;
+        }
+    }
+
+    public void Draw() 
+    {
+        if(deck.Count > 0)
+        {
+            for(int i = 0; i < hand.Length; i++)
+            {
+                if(hand[i] == null)
+                {
+                    CmdAddCard(deck.Dequeue(), i);
+                    return;
+                }
+            }
+
+            if(hand.Length < 5)
+            {
+                Array.Resize(ref hand, hand.Length + 1);
+                CmdAddCard(deck.Dequeue(), hand.Length - 1);
+                return;
+            }
+        }
+    }
+
+    [Command]
+    public void CmdAddCard(CardInfo card, int index)
+    {
+        GameObject bc = Instantiate(cardToDraw, new Vector3(0, 0, 0), Quaternion.identity);
+        HandCard hc = bc.GetComponent<HandCard>();
+        hc.cardData = new CardInfo(card.data);
+        hc.title = card.title;
+        hc.spr = card.spr;
+        hc.portrait = card.image;
+        hc.cardPosition = index;
+        bc.GetComponent<Image>().sprite = hc.portrait;
+        hand[index] = hc;
+        NetworkServer.Spawn(bc);
+
+        if(isServer) RpcDisplayHand(bc, index);
     }
 }

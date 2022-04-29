@@ -2127,6 +2127,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 7f7d6d7e843e8f44a984a43287bacf36, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  syncMode: 0
+  syncInterval: 0.1
   player: {fileID: 0}
 --- !u!114 &342526083
 MonoBehaviour:
@@ -5171,6 +5173,7 @@ MonoBehaviour:
   playerSpawnMethod: 0
   spawnPrefabs:
   - {fileID: 5026379625368372480, guid: 37a0296e0f1ae5e4082466a18c0856b2, type: 3}
+  - {fileID: 5026379625368372480, guid: c7333e764bebad643b9520472841f4a7, type: 3}
 --- !u!4 &795852369
 Transform:
   m_ObjectHideFlags: 0

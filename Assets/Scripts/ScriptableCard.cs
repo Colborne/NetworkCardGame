@@ -12,7 +12,6 @@ public class ScriptableCard : ScriptableObject
     public Sprite portrait;
     public int[] attackPattern;
     public FieldCard.Ability ability;
-    public FieldCard.Phase phase;
 
     static Dictionary<int, ScriptableCard> _cache;
     public static Dictionary<int, ScriptableCard> Cache
