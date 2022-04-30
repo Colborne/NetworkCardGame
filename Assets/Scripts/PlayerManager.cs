@@ -48,6 +48,7 @@ public class PlayerManager : NetworkBehaviour
     [SerializeField] public HandCard[] hand;
     [SerializeField] public FieldCard[] field;
     DeckBuilder deckBuilder;
+    public CurrentCard currentCard;
     
     [Command]
     public void CmdLoadPlayer(string user, int health, int sum, int deck)
@@ -81,6 +82,7 @@ public class PlayerManager : NetworkBehaviour
         
         playerField = GameObject.Find("Player Field");
         enemyField = GameObject.Find("Enemy Field");    
+        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
 
         FindObjectOfType<GameManager>().player = this;
         InstantiatePlayer();
@@ -132,8 +134,11 @@ public class PlayerManager : NetworkBehaviour
         if(!hasEnemy)
             UpdateEnemyInfo();
 
-        deckSize = deck.Count; 
-        CmdUpdatePlayerText(username,hp,sp,deckSize); 
+        if(deck != null)
+        {
+            deckSize = deck.Count; 
+            CmdUpdatePlayerText(username,hp,sp,deckSize); 
+        }
     }
 
     public void UpdateEnemyInfo()
@@ -239,5 +244,56 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(bc);
 
         if(isServer) RpcDisplayHand(bc, index);
+    }
+
+    [Command]
+    public void CmdEndTurn()
+    {
+        enemy.CmdStartNewTurn();
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdStartNewTurn()
+    {
+        sp++;
+        Draw();
+
+        int[] starting = new int[] {0,0,0,0,0};
+        
+        for(int i = 0; i < field.Length; i++)
+        {
+            if(field[i] != null)
+                starting[i] = 1;
+        }
+        
+        for(int enumCount = 0; enumCount < Enum.GetNames(typeof(FieldCard.Ability)).Length - 1; enumCount++)
+        {
+            for(int i = 0; i < field.Length; i++)
+            {
+                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
+                    field[i].UseAbility(this, enemy);
+                }
+            }
+        }
+    }
+    public void SelectCard(int index)
+    {
+        if(currentCard.portrait != null)
+        {
+            if(hand[index] == null)
+            {
+                CmdAddCard(currentCard.cardData, index);
+                currentCard = null;
+            }
+        }
+        else
+        {
+            currentCard.cardData = hand[index].cardData;
+            currentCard.portrait = hand[index].cardData.image;
+            currentCard.GetComponent<Image>().enabled = true;
+            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+            Destroy(hand[index].gameObject);
+            hand[index] = null;
+        }  
     }
 }

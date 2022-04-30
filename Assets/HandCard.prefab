@@ -14,7 +14,7 @@ GameObject:
   - component: {fileID: 1891454660526897803}
   - component: {fileID: 5560625206388279184}
   - component: {fileID: -5932811597465813642}
-  m_Layer: 0
+  m_Layer: 5
   m_Name: HandCard
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29,7 +29,7 @@ RectTransform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 5026379625368372480}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalPosition: {x: 0, y: 0, z: 100}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 1
   m_Children: []
@@ -128,6 +128,6 @@ MonoBehaviour:
   title: 
   spr: 0
   portrait: {fileID: 0}
-  clicked: 0
+  selected: 0
   cardPosition: 0
   CardBack: {fileID: -1251534854, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}

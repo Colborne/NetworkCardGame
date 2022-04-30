@@ -1,17 +1,32 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 using Mirror;
+using System.Linq;
+using System;
 
 public class GameManager : MonoBehaviour
 {
     public PlayerManager player;
-    bool started = false;
+    public bool isOurTurn;
  
-    public void PlayCard()
+    public void SelectCard(Button button)
     {
         player = PlayerManager.localPlayer;
-        player.CmdPlayCard(player.deck.Dequeue(),2);
+        player.SelectCard(button.GetComponentInChildren<HandCard>().cardPosition);
+    }
+
+    public void PlayCard(Button button)
+    {
+        if(player.currentCard.portrait != null)
+        {
+            player = PlayerManager.localPlayer;
+            player.CmdPlayCard(player.currentCard.cardData, button.GetComponent<Slot>().slotNumber);
+            player.currentCard.GetComponent<Image>().enabled = false;
+            player.currentCard.cardData = new CardInfo();
+            player.currentCard.portrait = null;
+        }
     }
 
     public void DealDamage()
@@ -25,5 +40,11 @@ public class GameManager : MonoBehaviour
                 player.field[i].CmdDamage(player, player.enemy);
             }              
         }       
+    }
+
+    public void EndTurn()
+    {
+        isOurTurn = !isOurTurn;
+        player.CmdEndTurn();
     }
 }

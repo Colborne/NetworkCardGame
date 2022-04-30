@@ -4,46 +4,37 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 
-public class FieldCard : NetworkBehaviour
+public class FieldCard : BaseCard
 {
     public enum Ability
     {
-        Draw,
-        Damage,
+        Swap,
+        Bomb,
+        Draw, 
+        StealCard,
+        DeckCard,
+        Sacrifice,
+        Defend,
         Heal,
         Summoning,
+        Damage,
         Duplicate,
-        Swap,
         Evolve,
-        Bomb,
+        Spawn,
         DrainLife,
         StealLife,
         DrainMana,
         StealMana,
         ClearBoard,
-        RemoveCard,
-        Spawn,
-        StealCard,
-        DeckCard
+        RemoveCard
     }
-
-    public enum Phase
-    {
-        BeforeTurn,
-        DuringTurn,
-        EndOfTurn
-    }
-    [SyncVar] public CardInfo cardData;
-    public string title;
-    public int spr;
-    public Sprite portrait;
     public bool clicked = false;
     public int[] attackPattern;
-    public int cardPosition;
     public Ability ability;
     public GameObject effect;
+    public int priority;
 
-    public void Update()
+    public override void Update()
     {
         if(title == "")
         {

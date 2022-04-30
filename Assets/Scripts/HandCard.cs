@@ -4,17 +4,9 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 
-public class HandCard : NetworkBehaviour
+public class HandCard : BaseCard
 {
-    [SyncVar] public CardInfo cardData;
-    public string title;
-    public int spr;
-    public Sprite portrait;
-    public bool clicked = false;
-    public int cardPosition;
-    public Sprite CardBack;
-
-    public void Update()
+    public override void Update()
     {
         if(title == "")
         {
@@ -26,26 +18,3 @@ public class HandCard : NetworkBehaviour
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 }
-
-/*
-
-        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10);
-        Ray castPoint = Camera.main.ScreenPointToRay(mousePos);
-        RaycastHit hit;
-        
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (Physics.Raycast(castPoint, out hit, Mathf.Infinity))
-            {
-                clicked = !clicked;
-            }
-        }
-
-        if(clicked)
-        {
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-            Vector3 fixedPosition = new Vector3(worldPosition.x, worldPosition.y, 0);
-            GetComponent<RectTransform>().position =  fixedPosition;
-        }
-
-*/
