@@ -76,3 +76,5 @@ MonoBehaviour:
   hasEnemy: 0
   hand: []
   field: []
+  currentCard: {fileID: 0}
+  CardBack: {fileID: -1251534854, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
