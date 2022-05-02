@@ -160,7 +160,7 @@ public class PlayerManager : NetworkBehaviour
 
                     for(int i = 0; i < cards.Length; i++)
                     {
-                        enemy.hand[i] = cards[i];
+                        enemy.hand[i] = cards[cards.Length - 1 - i];
                         cards[i].transform.SetParent(enemyField.transform.GetChild(5).GetChild(i), false);
                         cards[i].cardPosition = i;
                         cards[i].GetComponent<Image>().sprite = cards[i].GetComponent<HandCard>().CardBack;
@@ -168,6 +168,13 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
+    }
+
+    [Command]
+    public void CmdRemoveCard(int index)
+    {
+        hand[index] = null; 
+        Destroy(playerField.transform.GetChild(5).GetChild(index).GetChild(0).gameObject);
     }
 
     [Command]
@@ -187,6 +194,13 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(bc);
 
         if(isServer) RpcDisplayCard(bc, index);
+    }
+
+    [Command]
+    public void CmdDeleteCard(int index)
+    {
+        Destroy(hand[index].gameObject);
+        hand[index] = null;
     }
 
     [ClientRpc]
@@ -278,5 +292,22 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
+    }
+
+    public void SelectCard(int index)
+    {   
+        if(currentCard.portrait != null)
+        {
+            if(hand[index] == null)
+                CmdAddCard(currentCard.cardData, index);
+        }
+        else
+        {
+            currentCard.cardData = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData;
+            currentCard.portrait = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData.image;
+            currentCard.GetComponent<Image>().enabled = true;
+            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+            CmdDeleteCard(index);
+        }    
     }
 }

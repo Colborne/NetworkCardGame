@@ -14,7 +14,7 @@ public class GameManager : MonoBehaviour
     public void SelectCard(Button button)
     {
         player = PlayerManager.localPlayer;
-        player.currentCard.SelectCard(player, button.GetComponent<Slot>().slotNumber);
+        player.SelectCard(button.GetComponent<Slot>().slotNumber);
     }
 
     public void PlayCard(Button button)
