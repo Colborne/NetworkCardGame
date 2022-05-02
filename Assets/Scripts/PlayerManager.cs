@@ -44,7 +44,7 @@ public class PlayerManager : NetworkBehaviour
     public GameObject cardToDraw;
     public GameObject cardToSpawn;
     public bool hasEnemy;
-    [SerializeField] public Queue<CardInfo> deck;
+    [SerializeField] Queue<CardInfo> deck;
     [SerializeField] public HandCard[] hand;
     [SerializeField] public FieldCard[] field;
     DeckBuilder deckBuilder;
@@ -75,14 +75,15 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         localPlayer = this;
+        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();    
+        
     }
     public override void OnStartClient()
     {
         base.OnStartClient();
         
         playerField = GameObject.Find("Player Field");
-        enemyField = GameObject.Find("Enemy Field");    
-        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
+        enemyField = GameObject.Find("Enemy Field");
 
         FindObjectOfType<GameManager>().player = this;
         InstantiatePlayer();
@@ -131,6 +132,8 @@ public class PlayerManager : NetworkBehaviour
 
     private void Update() 
     {
+        if (!localPlayer)
+            return;
         if(!hasEnemy)
             UpdateEnemyInfo();
 
@@ -275,25 +278,5 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
-    }
-    public void SelectCard(int index)
-    {
-        if(currentCard.portrait != null)
-        {
-            if(hand[index] == null)
-            {
-                CmdAddCard(currentCard.cardData, index);
-                currentCard = null;
-            }
-        }
-        else
-        {
-            currentCard.cardData = hand[index].cardData;
-            currentCard.portrait = hand[index].cardData.image;
-            currentCard.GetComponent<Image>().enabled = true;
-            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
-            Destroy(hand[index].gameObject);
-            hand[index] = null;
-        }  
     }
 }

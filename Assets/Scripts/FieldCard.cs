@@ -121,9 +121,10 @@ public class FieldCard : BaseCard
                 player.sp += 1;
                 break;
             case Ability.ClearBoard:
+            /*
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    player.hand[i] = null;
+                    //player.hand[i] = null;
                     EffectSpawnSelected(player, true, i);
                 }
                 
@@ -171,7 +172,7 @@ public class FieldCard : BaseCard
                     rand = Random.Range(0, target.field.Length);
                     target.field[rand] = null;
                     EffectSpawnSelected(target, false, rand);
-                }
+                }*/
                 break;
             /*case Ability.Spawn:
                 for(int i = 0; i < 5; i++)
