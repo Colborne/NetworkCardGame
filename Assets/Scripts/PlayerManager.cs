@@ -50,7 +50,10 @@ public class PlayerManager : NetworkBehaviour
     DeckBuilder deckBuilder;
     public CurrentCard currentCard;
     public Sprite CardBack;
+    public GameObject endTurnButton;
     
+    public bool isOurTurn;
+
     [Command]
     public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
@@ -76,7 +79,8 @@ public class PlayerManager : NetworkBehaviour
     public override void OnStartLocalPlayer()
     {
         localPlayer = this;
-        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();    
+        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
+        endTurnButton = GameObject.Find("EndTurnButton");
         
     }
     public override void OnStartClient()
@@ -89,6 +93,9 @@ public class PlayerManager : NetworkBehaviour
         FindObjectOfType<GameManager>().player = this;
         InstantiatePlayer();
         CmdLoadPlayer(FindObjectOfType<TMP_InputField>().text, hp, sp, deckSize);
+
+        if(isServer)
+            isOurTurn = true;
     }
 
     public void InstantiatePlayer()
@@ -121,6 +128,15 @@ public class PlayerManager : NetworkBehaviour
             playerField.transform.GetChild(1).GetComponent<TMP_Text>().text = h.ToString();
             playerField.transform.GetChild(2).GetComponent<TMP_Text>().text = s.ToString();
             playerField.transform.GetChild(3).GetComponent<TMP_Text>().text = d.ToString();
+            
+            for(int i = 0; i < 5; i++)
+            {
+                if(playerField.transform.GetChild(5).GetChild(i).childCount > 0)
+                    localPlayer.hand[i] = playerField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>();
+                if(playerField.transform.GetChild(4).GetChild(i).childCount > 0)
+                    localPlayer.field[i] = playerField.transform.GetChild(4).GetChild(i).GetChild(0).GetComponent<FieldCard>();
+            }
+            
         }
         else
         {
@@ -147,7 +163,7 @@ public class PlayerManager : NetworkBehaviour
         if(deck != null)
         {
             deckSize = deck.Count; 
-            CmdUpdatePlayerText(username,hp,sp,deckSize); 
+            CmdUpdatePlayerText(username,hp,sp,deckSize);
         }
     }
 
@@ -163,6 +179,7 @@ public class PlayerManager : NetworkBehaviour
 
                 if(!isServer)
                 {
+                    endTurnButton.SetActive(false);
                     HandCard[] cards = FindObjectsOfType<HandCard>();
 
                     for(int i = 0; i < cards.Length; i++)
@@ -176,8 +193,6 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
-
-
 
     [Command]
     public void CmdPlayCard(CardInfo card, int index)
@@ -277,14 +292,33 @@ public class PlayerManager : NetworkBehaviour
         if(isServer) RpcDisplayHand(bc, index);
     }
 
+// Ends our turn and starts our opponent's turn.
     [Command]
     public void CmdEndTurn()
     {
-        enemy.CmdStartNewTurn();
+        RpcSetTurn();
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdStartNewTurn()
+    [ClientRpc]
+    public void RpcSetTurn()
+    {
+        if(hasAuthority)
+        {
+            // If isOurTurn was true, set it false. If it was false, set it true.
+            isOurTurn = !isOurTurn;
+            endTurnButton.SetActive(isOurTurn);
+
+            // If isOurTurn (after updating the bool above)
+            if (isOurTurn)
+            {
+                sp++;
+                Draw();
+            }
+        }
+    }
+
+    [ClientRpc]
+    public void RpcNewTurn()
     {
         sp++;
         Draw();
@@ -301,9 +335,9 @@ public class PlayerManager : NetworkBehaviour
         {
             for(int i = 0; i < field.Length; i++)
             {
-                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
-                    field[i].UseAbility(this, enemy);
-                }
+                //if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
+                //    field[i].UseAbility(this, enemy);
+                //}
             }
         }
     }

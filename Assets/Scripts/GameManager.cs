@@ -9,7 +9,7 @@ using System;
 public class GameManager : MonoBehaviour
 {
     public PlayerManager player;
-    public bool isOurTurn;
+    public bool isOurTurn = false;
  
     public void SelectCard(Button button)
     {
@@ -44,7 +44,10 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        isOurTurn = !isOurTurn;
+        player = PlayerManager.localPlayer;
+        player.isOurTurn = false;
+        player.endTurnButton.SetActive(false); 
+        player.enemy.isOurTurn = true;
         player.CmdEndTurn();
     }
 }
