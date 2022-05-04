@@ -202,7 +202,8 @@ public class FieldCard : BaseCard
     {
         player.hp += amount;
     }
-
+    
+    [Command(requiresAuthority = false)]
     public void CmdMana(PlayerManager player, int amount)
     {
         player.sp += amount;
@@ -246,24 +247,24 @@ public class FieldCard : BaseCard
                 {
                     if(i == cardPosition - 2 && farLeftDamage > 0){
                         target.hp -= farLeftDamage;
-                        AttackSetup(player,target,i);
+                        AttackSetup(player,target, i);
                     }
                     else if(i == cardPosition - 1 && leftDamage > 0){
                         target.hp -= leftDamage;
-                        AttackSetup(player, target,i);
+                        AttackSetup(player, target, i);
                     }
                     else if(i == cardPosition && mainDamage > 0)
                     {
                         target.hp -= mainDamage;
-                        AttackSetup(player, target,i);
+                        AttackSetup(player, target, i);
                     }
                     else if(i == cardPosition + 1 && rightDamage > 0){
                         target.hp -= rightDamage;
-                        AttackSetup(player, target,i);
+                        AttackSetup(player, target, i);
                     }
                     else if(i == cardPosition + 2 && farRightDamage > 0){
                         target.hp -= farRightDamage;
-                        AttackSetup(player, target,i);
+                        AttackSetup(player, target, i);
                     }
                 }
             }
@@ -274,7 +275,7 @@ public class FieldCard : BaseCard
     {
         var attack = Instantiate(effect, transform.position, Quaternion.identity);
         attack.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(5).GetChild(i).position;
+        attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(4).GetChild(i).position;
         attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
     }
 
@@ -295,7 +296,7 @@ public class FieldCard : BaseCard
         }
         else
         {
-            var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
+            var eff = Instantiate(effect, player.playerField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
             eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
             eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         }

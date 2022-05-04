@@ -14,18 +14,26 @@ public class GameManager : MonoBehaviour
     public void SelectCard(Button button)
     {
         player = PlayerManager.localPlayer;
-        player.SelectCard(button.GetComponent<Slot>().slotNumber);
+        if(player.isOurTurn)
+            player.SelectCard(button.GetComponent<Slot>().slotNumber);
     }
 
     public void PlayCard(Button button)
     {
-        if(player.currentCard.portrait != null)
+        player = PlayerManager.localPlayer;
+        if(player.isOurTurn)
         {
-            player = PlayerManager.localPlayer;
-            player.CmdPlayCard(player.currentCard.cardData, button.GetComponent<Slot>().slotNumber);
-            player.currentCard.GetComponent<Image>().enabled = false;
-            player.currentCard.cardData = new CardInfo();
-            player.currentCard.portrait = null;
+            if(player.currentCard.portrait != null)
+            {
+                if(player.sp >= player.currentCard.cardData.spr)
+                {
+                    player.sp -= player.currentCard.cardData.spr;
+                    player.CmdPlayCard(player.currentCard.cardData, button.GetComponent<Slot>().slotNumber);
+                    player.currentCard.GetComponent<Image>().enabled = false;
+                    player.currentCard.cardData = new CardInfo();
+                    player.currentCard.portrait = null;
+                }
+            }
         }
     }
 

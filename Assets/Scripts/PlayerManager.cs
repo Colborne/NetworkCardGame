@@ -319,6 +319,10 @@ public class PlayerManager : NetworkBehaviour
                     localPlayer.hand[i] = playerField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>();
                 if(playerField.transform.GetChild(4).GetChild(i).childCount > 0)
                     localPlayer.field[i] = playerField.transform.GetChild(4).GetChild(i).GetChild(0).GetComponent<FieldCard>();
+                if(enemyField.transform.GetChild(5).GetChild(i).childCount > 0)
+                    localPlayer.enemy.hand[i] = enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>();
+                if(enemyField.transform.GetChild(4).GetChild(i).childCount > 0)
+                    localPlayer.enemy.field[i] = enemyField.transform.GetChild(4).GetChild(i).GetChild(0).GetComponent<FieldCard>();
             }
             
         }
