@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Staff
   spr: 4
   portrait: {fileID: 605110926, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 18
+  effect: {fileID: 6245953675364399562, guid: 47d3623cef801b542b76d30ab98e291b, type: 3}
+  spawn: {fileID: 0}

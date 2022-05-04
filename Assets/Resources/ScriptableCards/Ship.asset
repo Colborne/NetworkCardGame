@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Ship
   spr: 5
   portrait: {fileID: 651017819, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 12
+  effect: {fileID: 6245953675364399562, guid: f609ba345564bab458631eb58dedfe42, type: 3}
+  spawn: {fileID: 11400000, guid: f3e27d60435b6f747b10935de06fafa2, type: 2}

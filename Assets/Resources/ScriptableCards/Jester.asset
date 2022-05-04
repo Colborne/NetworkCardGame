@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Jester
   spr: 2
   portrait: {fileID: 13255791, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 0
+  effect: {fileID: 6245953675364399562, guid: d476933d0933ba04c9222bd76db717f1, type: 3}
+  spawn: {fileID: 0}

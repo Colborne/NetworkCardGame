@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Skeleton Key
   spr: 2
   portrait: {fileID: 1903531218, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 4
+  effect: {fileID: 6245953675364399562, guid: 6d0eee1436aadad4d894f051deffa263, type: 3}
+  spawn: {fileID: 0}

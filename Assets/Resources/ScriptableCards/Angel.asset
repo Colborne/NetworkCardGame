@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Angel
   spr: 1
   portrait: {fileID: 479637215, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 7
+  effect: {fileID: 4545312847439962642, guid: 1a1fb9073c13c0e4b8dff838ffafc3cd, type: 3}
+  spawn: {fileID: 0}

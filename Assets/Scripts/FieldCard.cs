@@ -32,6 +32,7 @@ public class FieldCard : BaseCard
     public int[] attackPattern;
     public Ability ability;
     public GameObject effect;
+    public ScriptableCard spawn;
     public int priority;
 
     public override void Update()
@@ -41,6 +42,10 @@ public class FieldCard : BaseCard
             title = cardData.title;
             spr = cardData.spr;
             portrait = cardData.image;
+            effect = cardData.effect;
+            attackPattern = cardData.attackPattern;
+            priority = cardData.ability;
+            spawn = cardData.spawn;
             GetComponent<Image>().sprite = portrait;
         }
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
@@ -52,13 +57,13 @@ public class FieldCard : BaseCard
         {
             case Ability.Draw:
                 EffectSpawn(player);
-                /*for(int i = 0; i < spr; i++)
-                    player.Draw();*/
+                for(int i = 0; i < spr; i++)
+                    player.Draw();
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);
                 player.hp -= spr;
-                player.field[cardPosition] = null;
+                player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Damage:
                 CmdDamage(player, target);
@@ -77,8 +82,7 @@ public class FieldCard : BaseCard
                 {
                     if(player.field[i] == null)
                     {
-                        var dupe = Instantiate(this);
-                        player.field[i] = dupe;
+                        player.CmdPlayCard(cardData, i);
                         return;
                     }
                 }
@@ -93,15 +97,15 @@ public class FieldCard : BaseCard
                     
                 }
                 break;
-            /*case Ability.Evolve:
+            case Ability.Evolve:
                 EffectSpawn(player);
-                if(evolution != null && player.sp > 0)
+                if(spawn != null && player.sp > 0)
                 {
                     player.sp--;
-                    player.field[cardPosition] = Instantiate(evolution);
+                    player.CmdPlayCard(new CardInfo(spawn), cardPosition);
                     player.field[cardPosition].cardPosition = cardPosition; 
                 }
-                break;*/
+                break;
             case Ability.DrainLife:
                 EffectSpawn(player);
                 target.hp = Mathf.Max(0, target.hp - player.field[cardPosition].spr);
@@ -121,10 +125,10 @@ public class FieldCard : BaseCard
                 player.sp += 1;
                 break;
             case Ability.ClearBoard:
-            /*
+            
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    //player.hand[i] = null;
+                    player.hand[i] = null;
                     EffectSpawnSelected(player, true, i);
                 }
                 
@@ -172,14 +176,14 @@ public class FieldCard : BaseCard
                     rand = Random.Range(0, target.field.Length);
                     target.field[rand] = null;
                     EffectSpawnSelected(target, false, rand);
-                }*/
+                }
                 break;
-            /*case Ability.Spawn:
+            case Ability.Spawn:
                 for(int i = 0; i < 5; i++)
                 {
                     if(target.field[i] == null)
                     {
-                        target.field[i] = Instantiate(spawn);
+                        target.CmdPlayCard(new CardInfo(spawn), i);
                         target.field[i].cardPosition = i;
                         EffectSpawnSelected(target, false, i);
                     }
@@ -189,7 +193,7 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(target.deck.Count > 0)
                 {
-                    player.field[cardPosition] = target.deck.Dequeue();
+                    player.CmdPlayCard(target.deck.Dequeue(), cardPosition);
                     player.field[cardPosition].cardPosition = cardPosition;
                 }
                 break;
@@ -197,10 +201,10 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(player.deck.Count > 0)
                 {
-                    player.field[cardPosition] = player.deck.Dequeue();
+                    player.CmdPlayCard(player.deck.Dequeue(), cardPosition);
                     player.field[cardPosition].cardPosition = cardPosition;
                 }
-                break;*/
+                break;
         }
     }
 
@@ -236,32 +240,32 @@ public class FieldCard : BaseCard
                     if(damage > 0)
                     {
                         target.hp -= damage;
-                        //target.field[i] = null;
-                        //AttackSetup(player, target,i);
+                        target.field[i] = null;
+                        AttackSetup(player, target,i);
                     }
                 }
                 else
                 {
                     if(i == cardPosition - 2 && farLeftDamage > 0){
                         target.hp -= farLeftDamage;
-                        //AttackSetup(player,target,i);
+                        AttackSetup(player,target,i);
                     }
                     else if(i == cardPosition - 1 && leftDamage > 0){
                         target.hp -= leftDamage;
-                        //AttackSetup(player, target,i);
+                        AttackSetup(player, target,i);
                     }
                     else if(i == cardPosition && mainDamage > 0)
                     {
                         target.hp -= mainDamage;
-                        //AttackSetup(player, target,i);
+                        AttackSetup(player, target,i);
                     }
                     else if(i == cardPosition + 1 && rightDamage > 0){
                         target.hp -= rightDamage;
-                        //AttackSetup(player, target,i);
+                        AttackSetup(player, target,i);
                     }
                     else if(i == cardPosition + 2 && farRightDamage > 0){
                         target.hp -= farRightDamage;
-                        //AttackSetup(player, target,i);
+                        AttackSetup(player, target,i);
                     }
                 }
             }
@@ -319,26 +323,3 @@ public class FieldCard : BaseCard
         }
     }
 }
-
-/*
-
-        Vector3 mousePos = new Vector3(Input.mousePosition.x, Input.mousePosition.y, -10);
-        Ray castPoint = Camera.main.ScreenPointToRay(mousePos);
-        RaycastHit hit;
-        
-        if (Input.GetMouseButtonDown(0))
-        {
-            if (Physics.Raycast(castPoint, out hit, Mathf.Infinity))
-            {
-                clicked = !clicked;
-            }
-        }
-
-        if(clicked)
-        {
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(mousePos);
-            Vector3 fixedPosition = new Vector3(worldPosition.x, worldPosition.y, 0);
-            GetComponent<RectTransform>().position =  fixedPosition;
-        }
-
-*/

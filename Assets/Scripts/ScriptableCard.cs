@@ -12,6 +12,8 @@ public class ScriptableCard : ScriptableObject
     public Sprite portrait;
     public int[] attackPattern;
     public FieldCard.Ability ability;
+    public GameObject effect;
+    public ScriptableCard spawn;
 
     static Dictionary<int, ScriptableCard> _cache;
     public static Dictionary<int, ScriptableCard> Cache
@@ -20,9 +22,7 @@ public class ScriptableCard : ScriptableObject
         {
             if (_cache == null)
             {
-                // Load all ScriptableCards from our Resources folder
                 ScriptableCard[] cards = Resources.LoadAll<ScriptableCard>("");
-
                 _cache = cards.ToDictionary(card => card.cardID, card => card);
             }
             return _cache;

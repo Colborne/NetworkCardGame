@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Vampire
   spr: 3
   portrait: {fileID: -1581076955, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 15
+  effect: {fileID: 6245953675364399562, guid: 9e84a4d632a1c6d4bb132245974637c3, type: 3}
+  spawn: {fileID: 0}

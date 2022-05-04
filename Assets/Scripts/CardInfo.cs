@@ -13,7 +13,6 @@ public struct CardInfo
     {
         get
         {
-            // Return ScriptableCard from our cached list, based on the card's uniqueID.
             return ScriptableCard.Cache[cardID];
         }
     }
@@ -23,4 +22,6 @@ public struct CardInfo
     public int spr => data.spr;
     public int[] attackPattern => data.attackPattern;
     public int ability => (int)data.ability;
+    public GameObject effect => data.effect;
+    public ScriptableCard spawn => data.spawn;
 }

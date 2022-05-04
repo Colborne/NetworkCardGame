@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Chick
   spr: 2
   portrait: {fileID: -973579807, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 11
+  effect: {fileID: 6245953675364399562, guid: b4be8b4eed05390419ca5c7439c70e34, type: 3}
+  spawn: {fileID: 11400000, guid: 6a70bd89afe354843a0bec9d0540eecc, type: 2}

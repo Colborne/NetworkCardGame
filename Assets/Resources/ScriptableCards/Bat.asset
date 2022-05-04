@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Bat
   spr: 1
   portrait: {fileID: 417682171, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 11
+  effect: {fileID: 6245953675364399562, guid: b4be8b4eed05390419ca5c7439c70e34, type: 3}
+  spawn: {fileID: 11400000, guid: 17120263afee0214eaf67e6b4d88f9a8, type: 2}

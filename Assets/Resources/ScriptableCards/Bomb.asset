@@ -16,3 +16,7 @@ MonoBehaviour:
   title: Bomb
   spr: 1
   portrait: {fileID: -1813424044, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  attackPattern: 
+  ability: 1
+  effect: {fileID: 6245953675364399562, guid: 3cd9c2c717f26d34281163ab928b6c83, type: 3}
+  spawn: {fileID: 0}
