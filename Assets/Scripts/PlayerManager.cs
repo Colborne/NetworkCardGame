@@ -37,6 +37,7 @@ public class PlayerManager : NetworkBehaviour
     [SyncVar] public int hp;
     [SyncVar] public int sp;
     [SyncVar] public int deckSize;
+    [SyncVar(hook = nameof(UpdateTurn))] public bool isOurTurn;
     public PlayerManager enemy;
     public static PlayerManager localPlayer;
     public GameObject playerField;
@@ -48,11 +49,10 @@ public class PlayerManager : NetworkBehaviour
     [SerializeField] public HandCard[] hand;
     [SerializeField] public FieldCard[] field;
     DeckBuilder deckBuilder;
+    TurnManager turnManager;
     public CurrentCard currentCard;
     public Sprite CardBack;
     public GameObject endTurnButton;
-    
-    public bool isOurTurn;
 
     [Command]
     public void CmdLoadPlayer(string user, int health, int sum, int deck)
@@ -69,19 +69,23 @@ public class PlayerManager : NetworkBehaviour
         gameObject.name = newUser;
     }
 
+    void UpdateTurn(bool oldTurn, bool newTurn)
+    {
+        isOurTurn = newTurn;
+    }
+
     private void Awake() 
     {
         deckBuilder = FindObjectOfType<DeckBuilder>();
+        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
+        endTurnButton = GameObject.Find("Canvas/EndTurnButton");
         hp = 20;
         sp = 1;
     }
 
     public override void OnStartLocalPlayer()
     {
-        localPlayer = this;
-        currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
-        endTurnButton = GameObject.Find("EndTurnButton");
-        
+        localPlayer = this;   
     }
     public override void OnStartClient()
     {
@@ -92,11 +96,8 @@ public class PlayerManager : NetworkBehaviour
 
         FindObjectOfType<GameManager>().player = this;
         InstantiatePlayer();
-        CmdLoadPlayer(FindObjectOfType<TMP_InputField>().text, hp, sp, deckSize);
-
-        if(isServer)
-            isOurTurn = true;
-    }
+        CmdLoadPlayer(FindObjectOfType<TMP_InputField>().text, hp, sp, deckSize); 
+}
 
     public void InstantiatePlayer()
     {
@@ -111,6 +112,7 @@ public class PlayerManager : NetworkBehaviour
 
         for(int i = 0; i < 3; i++)
             CmdAddCard(deck.Dequeue(), i); 
+
     }
 
     [Command]
@@ -165,6 +167,9 @@ public class PlayerManager : NetworkBehaviour
             deckSize = deck.Count; 
             CmdUpdatePlayerText(username,hp,sp,deckSize);
         }
+
+        if(endTurnButton != null)
+            endTurnButton.SetActive(isOurTurn);
     }
 
     public void UpdateEnemyInfo()
@@ -179,7 +184,6 @@ public class PlayerManager : NetworkBehaviour
 
                 if(!isServer)
                 {
-                    endTurnButton.SetActive(false);
                     HandCard[] cards = FindObjectsOfType<HandCard>();
 
                     for(int i = 0; i < cards.Length; i++)
@@ -255,12 +259,14 @@ public class PlayerManager : NetworkBehaviour
 
     public void Draw() 
     {
+        Debug.Log("Drawing");
         if(deck.Count > 0)
         {
             for(int i = 0; i < hand.Length; i++)
             {
                 if(hand[i] == null)
                 {
+                    Debug.Log("Drawing");
                     CmdAddCard(deck.Dequeue(), i);
                     return;
                 }
@@ -291,34 +297,7 @@ public class PlayerManager : NetworkBehaviour
 
         if(isServer) RpcDisplayHand(bc, index);
     }
-
-// Ends our turn and starts our opponent's turn.
-    [Command]
-    public void CmdEndTurn()
-    {
-        RpcSetTurn();
-    }
-
-    [ClientRpc]
-    public void RpcSetTurn()
-    {
-        if(hasAuthority)
-        {
-            // If isOurTurn was true, set it false. If it was false, set it true.
-            isOurTurn = !isOurTurn;
-            endTurnButton.SetActive(isOurTurn);
-
-            // If isOurTurn (after updating the bool above)
-            if (isOurTurn)
-            {
-                sp++;
-                Draw();
-            }
-        }
-    }
-
-    [ClientRpc]
-    public void RpcNewTurn()
+    public void NewTurn()
     {
         sp++;
         Draw();

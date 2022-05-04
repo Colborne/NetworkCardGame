@@ -1,81 +1,63 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Mirror;
 
-public class TurnManager : MonoBehaviour
+public class TurnManager : NetworkBehaviour
 {
-    public Player playerOne, playerTwo;
-    public Player currentPlayer, target;
-    public List<GameObject> allCards;
-    public bool startingTurn;
-    public int whichPlayer = 1;
-    public int[] starting;
+    public PlayerManager playerOne, playerTwo;
+    [SyncVar] public int whichPlayer = -1;
+    public bool needPlayers = true;
 
-    void Start()
+    private void Update() 
     {
-        startingTurn = false;
-        currentPlayer = playerOne;
-        target = playerTwo;
-        target.currentTurn.enabled = false;
-        target.sp = 0;
-    }
-
-    void Update()
-    {
-        if(startingTurn)
+        if(needPlayers)
         {
-            NewTurn();
-            startingTurn = false;
-        }
-    }
-
-    void NewTurn()
-    {
-        currentPlayer.currentTurn.enabled = true;
-        target.currentTurn.enabled = false;
-        currentPlayer.sp++;
-        currentPlayer.Draw();
-
-        starting = new int[] {0,0,0,0,0};
-        for(int i = 0; i < currentPlayer.field.Length; i++)
-        {
-            if(currentPlayer.field[i] != null)
-                starting[i] = 1;
-        }
-
-        for(int i = 0; i < currentPlayer.field.Length; i++)
-        {
-            if(currentPlayer.field[i] != null && starting[i] == 1 && currentPlayer.field[i].phase == Card.Phase.Beginning){
-                currentPlayer.field[i].UseAbility(currentPlayer, target);
+            if(PlayerManager.localPlayer != null)
+            {
+                if(PlayerManager.localPlayer.isServer)
+                {
+                    playerOne = PlayerManager.localPlayer;
+                    if(PlayerManager.localPlayer.enemy != null)
+                    {
+                        playerTwo = PlayerManager.localPlayer.enemy;
+                        needPlayers = false;
+                        whichPlayer = 0;
+                        playerOne.isOurTurn = true;
+                    }
+                    else return;
+                }
             }
-        }
-        
-        for(int i = 0; i < currentPlayer.field.Length; i++)
-        {
-            if(currentPlayer.field[i] != null && currentPlayer.field[i].phase == Card.Phase.During)
-                currentPlayer.field[i].UseAbility(currentPlayer, target);
+            else return;
         }
     }
-    
-    public void EndTurn()
-    {
-        for(int i = 0; i < currentPlayer.field.Length; i++)
-        {
-            if(currentPlayer.field[i] != null && currentPlayer.field[i].phase == Card.Phase.End)
-                currentPlayer.field[i].UseAbility(currentPlayer, target);
-        }      
 
-        if(currentPlayer == playerOne)
-        {
-            currentPlayer = playerTwo;
-            target = playerOne;
-        }
-        else
-        {
-            currentPlayer = playerOne;
-            target = playerTwo;
-        }
-        
-        startingTurn = true;
+    [Command(requiresAuthority = false)]
+    public void CmdSetTurn(PlayerManager player)
+    {
+        RpcSetTurn(player);
+    }
+
+    [Command(requiresAuthority = false)]
+    public void CmdSetBool(PlayerManager player, bool value)
+    {
+        player.isOurTurn = value;
+    }
+
+    [ClientRpc]
+    public void RpcSetTurn(PlayerManager player)
+    {
+        player.NewTurn();
+    }
+
+    public void EndTurn(PlayerManager currentPlayer, PlayerManager target)
+    {
+        CmdSetBool(currentPlayer, false);
+        CmdSetBool(target, true);
+        CmdSetTurn(currentPlayer.enemy);
+        if(whichPlayer == 0)
+            whichPlayer = 1;
+        else if(whichPlayer == 1)
+            whichPlayer = 0;
     }
 }
