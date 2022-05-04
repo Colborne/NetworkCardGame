@@ -62,7 +62,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);
-                player.hp -= spr;
+                CmdHeal(player, -spr);
                 player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Damage:
@@ -70,11 +70,11 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Heal:
                 EffectSpawn(player);
-                player.hp += spr;
+                CmdHeal(player, spr);
                 break;
             case Ability.Summoning:
                 EffectSpawn(player);
-                player.sp += spr;
+                CmdMana(player, spr);
                 break;
             case Ability.Duplicate:
                 EffectSpawn(player);
@@ -92,7 +92,7 @@ public class FieldCard : BaseCard
                 if(target.field[cardPosition] != null)
                 {
                     FieldCard temp = target.field[cardPosition];
-                    target.field[cardPosition] = player.field[cardPosition];
+                    target.field[cardPosition] = this;
                     player.field[cardPosition] = temp;
                     
                 }
@@ -101,51 +101,38 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(spawn != null && player.sp > 0)
                 {
-                    player.sp--;
                     player.CmdPlayCard(new CardInfo(spawn), cardPosition);
-                    player.field[cardPosition].cardPosition = cardPosition; 
+                    player.field[cardPosition].cardPosition = cardPosition;
+                    Destroy(this);
                 }
                 break;
             case Ability.DrainLife:
                 EffectSpawn(player);
-                target.hp = Mathf.Max(0, target.hp - player.field[cardPosition].spr);
+                CmdHeal(target, -spr);
                 break;
             case Ability.StealLife:
                 EffectSpawn(player);
-                target.hp = Mathf.Max(0, target.hp - 1);
-                player.hp += 1;
+                CmdHeal(target, -1);
+                CmdHeal(player, 1);
                 break;
             case Ability.DrainMana:
                 EffectSpawn(player);
-                target.sp = Mathf.Max(0, target.sp - player.field[cardPosition].spr);
+                CmdMana(target, -spr);
                 break;
             case Ability.StealMana:
                 EffectSpawn(player);
-                target.sp = Mathf.Max(0, target.sp - 1);
-                player.sp += 1;
+                CmdMana(target, -1);
+                CmdMana(player, 1);
                 break;
             case Ability.ClearBoard:
-            
                 for(int i = 0; i < player.hand.Length; i++)
                 {
                     player.hand[i] = null;
                     EffectSpawnSelected(player, true, i);
-                }
-                
-                for(int i = 0; i < player.field.Length; i++)
-                {
                     player.field[i] = null;
                     EffectSpawnSelected(player, false, i);
-                }
-                
-                for(int i = 0; i < target.hand.Length; i++)
-                {
                     target.hand[i] = null;
                     EffectSpawnSelected(target, true, i);
-                }
-                
-                for(int i = 0; i < target.field.Length; i++)
-                {
                     target.field[i] = null;
                     EffectSpawnSelected(target, false, i);
                 }
@@ -195,6 +182,7 @@ public class FieldCard : BaseCard
                 {
                     player.CmdPlayCard(target.deck.Dequeue(), cardPosition);
                     player.field[cardPosition].cardPosition = cardPosition;
+                    Destroy(gameObject);
                 }
                 break;
             case Ability.DeckCard:
@@ -203,12 +191,22 @@ public class FieldCard : BaseCard
                 {
                     player.CmdPlayCard(player.deck.Dequeue(), cardPosition);
                     player.field[cardPosition].cardPosition = cardPosition;
+                    Destroy(gameObject);
                 }
                 break;
         }
     }
 
+    [Command(requiresAuthority = false)]
+    public void CmdHeal(PlayerManager player, int amount)
+    {
+        player.hp += amount;
+    }
 
+    public void CmdMana(PlayerManager player, int amount)
+    {
+        player.sp += amount;
+    }
 
     [Command(requiresAuthority = false)]
     public void CmdDamage(PlayerManager player, PlayerManager target)
@@ -241,7 +239,7 @@ public class FieldCard : BaseCard
                     {
                         target.hp -= damage;
                         target.field[i] = null;
-                        AttackSetup(player, target,i);
+                        AttackSetup(player, target, i);
                     }
                 }
                 else
@@ -274,28 +272,16 @@ public class FieldCard : BaseCard
     
     void AttackSetup(PlayerManager player, PlayerManager target, int i) 
     {
-        RectTransform rect = player.field[cardPosition].GetComponent<RectTransform>();
-        var attack = Instantiate(effect, rect.localPosition, rect.rotation);
+        var attack = Instantiate(effect, transform.position, Quaternion.identity);
         attack.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        attack.GetComponent<RectTransform>().localPosition = new Vector3(
-            player.field[cardPosition].GetComponent<RectTransform>().localPosition.x, 
-            player.field[cardPosition].GetComponent<RectTransform>().localPosition.y, 
-            -50);
-        attack.GetComponent<Projectile>().destination = new Vector3(
-            target.field[i].GetComponent<RectTransform>().localPosition.x,
-            target.field[i].GetComponent<RectTransform>().localPosition.y,
-            -50);
+        attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(5).GetChild(i).position;
         attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
     }
 
     void EffectSpawn(PlayerManager player)
     {
-        var eff = Instantiate(effect, player.field[cardPosition].GetComponent<RectTransform>().localPosition, Quaternion.identity);
+        var eff = Instantiate(effect, transform.position, Quaternion.identity);
         eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        eff.GetComponent<RectTransform>().localPosition = new Vector3(
-            player.field[cardPosition].GetComponent<RectTransform>().localPosition.x, 
-            player.field[cardPosition].GetComponent<RectTransform>().localPosition.y, 
-            -50);
         eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 
@@ -303,22 +289,14 @@ public class FieldCard : BaseCard
     {
         if(isHand)
         {
-            var eff = Instantiate(effect, player.field[i].GetComponent<RectTransform>().localPosition, Quaternion.identity);
+            var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
             eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-            eff.GetComponent<RectTransform>().localPosition = new Vector3(
-                player.field[i].GetComponent<RectTransform>().localPosition.x, 
-                player.field[i].GetComponent<RectTransform>().localPosition.y, 
-                -50);
             eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         }
         else
         {
-            var eff = Instantiate(effect, player.field[i].GetComponent<RectTransform>().localPosition, Quaternion.identity);
+            var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
             eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-            eff.GetComponent<RectTransform>().localPosition = new Vector3(
-                player.field[i].GetComponent<RectTransform>().localPosition.x, 
-                player.field[i].GetComponent<RectTransform>().localPosition.y, 
-                -50);
             eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         }
     }
