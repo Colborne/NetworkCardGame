@@ -99,11 +99,10 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
-                if(spawn != null && player.sp > 0)
+                if(spawn != null)
                 {
                     player.CmdPlayCard(new CardInfo(spawn), cardPosition);
-                    player.field[cardPosition].cardPosition = cardPosition;
-                    Destroy(this);
+                    Destroy(gameObject);
                 }
                 break;
             case Ability.DrainLife:
@@ -218,54 +217,61 @@ public class FieldCard : BaseCard
         int rightDamage = attackPattern[3];
         int farRightDamage = attackPattern[4];
 
+        Debug.Log(farLeftDamage + "/" + leftDamage + "/" + mainDamage + "/" + rightDamage + "/" + farRightDamage);
+
         for(int i = 0; i < 5; i++)
         {
-            if(attackPattern[i] != 0)
+            Debug.Log(i);
+            if(target.field[i] != null)
             {
-                if(target.field[i] != null)
+                int damage = 0;
+                if(i == cardPosition - 2)
+                    damage = Mathf.Max(0, farLeftDamage - target.field[i].spr);
+                else if(i == cardPosition - 1)
+                    damage = Mathf.Max(0, leftDamage - target.field[i].spr);
+                else if(i == cardPosition)
+                    damage = Mathf.Max(0, mainDamage - target.field[i].spr);
+                else if(i == cardPosition + 1)
+                    damage = Mathf.Max(0, rightDamage - target.field[i].spr);
+                else if(i == cardPosition + 2)
+                    damage = Mathf.Max(0, farRightDamage - target.field[i].spr);
+        
+                if(damage > 0)
                 {
-                    int damage = 0;
-                    if(i == cardPosition - 2)
-                        damage = Mathf.Max(0, farLeftDamage - target.field[i].spr);
-                    else if(i == cardPosition - 1)
-                        damage = Mathf.Max(0, leftDamage - target.field[i].spr);
-                    else if(i == cardPosition)
-                        damage = Mathf.Max(0, mainDamage - target.field[i].spr);
-                    else if(i == cardPosition + 1)
-                        damage = Mathf.Max(0, rightDamage - target.field[i].spr);
-                    else if(i == cardPosition + 2)
-                        damage = Mathf.Max(0, farRightDamage - target.field[i].spr);
-            
-                    if(damage > 0)
-                    {
-                        target.hp -= damage;
-                        target.field[i] = null;
-                        AttackSetup(player, target, i);
-                    }
+                    target.hp -= damage;
+                    target.CmdDestroyFieldCard(i);
+                    AttackSetup(player, target, i);
                 }
-                else
+            }
+            else
+            {
+                if(i == cardPosition - 2 && farLeftDamage > 0)
                 {
-                    if(i == cardPosition - 2 && farLeftDamage > 0){
-                        target.hp -= farLeftDamage;
-                        AttackSetup(player,target, i);
-                    }
-                    else if(i == cardPosition - 1 && leftDamage > 0){
-                        target.hp -= leftDamage;
-                        AttackSetup(player, target, i);
-                    }
-                    else if(i == cardPosition && mainDamage > 0)
-                    {
-                        target.hp -= mainDamage;
-                        AttackSetup(player, target, i);
-                    }
-                    else if(i == cardPosition + 1 && rightDamage > 0){
-                        target.hp -= rightDamage;
-                        AttackSetup(player, target, i);
-                    }
-                    else if(i == cardPosition + 2 && farRightDamage > 0){
-                        target.hp -= farRightDamage;
-                        AttackSetup(player, target, i);
-                    }
+                    Debug.Log("fld" + farLeftDamage);
+                    target.hp -= farLeftDamage;
+                    AttackSetup(player,target, i);
+                }
+                else if(i == cardPosition - 1 && leftDamage > 0)
+                {
+                    Debug.Log("left" + leftDamage);
+                    target.hp -= leftDamage;
+                    AttackSetup(player, target, i);
+                }
+                else if(i == cardPosition && mainDamage > 0)
+                {
+                    Debug.Log("main" + mainDamage);
+                    target.hp -= mainDamage;
+                    AttackSetup(player, target, i);
+                }
+                else if(i == cardPosition + 1 && rightDamage > 0){
+                    Debug.Log("right" + rightDamage);
+                    target.hp -= rightDamage;
+                    AttackSetup(player, target, i);
+                }
+                else if(i == cardPosition + 2 && farRightDamage > 0){
+                    Debug.Log("frd" + farRightDamage);
+                    target.hp -= farRightDamage;
+                    AttackSetup(player, target, i);
                 }
             }
         }
