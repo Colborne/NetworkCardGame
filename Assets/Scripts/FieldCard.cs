@@ -101,8 +101,8 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(spawn != null)
                 {
+                    player.CmdDestroyFieldCard(cardPosition);
                     player.CmdPlayCard(new CardInfo(spawn), cardPosition);
-                    Destroy(gameObject);
                 }
                 break;
             case Ability.DrainLife:
@@ -126,13 +126,13 @@ public class FieldCard : BaseCard
             case Ability.ClearBoard:
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    player.hand[i] = null;
+                    player.CmdDestroyHandCard(i);
                     EffectSpawnSelected(player, true, i);
-                    player.field[i] = null;
+                    player.CmdDestroyFieldCard(i);
                     EffectSpawnSelected(player, false, i);
-                    target.hand[i] = null;
+                    target.CmdDestroyHandCard(i);
                     EffectSpawnSelected(target, true, i);
-                    target.field[i] = null;
+                    target.CmdDestroyFieldCard(i);
                     EffectSpawnSelected(target, false, i);
                 }
                 break;
@@ -142,25 +142,25 @@ public class FieldCard : BaseCard
                 if(rand == 0)
                 {
                     rand = Random.Range(0, player.hand.Length);
-                    player.hand[rand] = null;
+                    player.CmdDestroyHandCard(rand);
                     EffectSpawnSelected(player, true, rand);
                 }
                 else if(rand == 1)
                 {
                     rand = Random.Range(0, player.field.Length);
-                    player.field[rand] = null;
+                    player.CmdDestroyFieldCard(rand);
                     EffectSpawnSelected(player, false, rand);
                 }
                 else if(rand == 2)
                 {
                     rand = Random.Range(0, target.hand.Length);
-                    target.hand[rand] = null;
+                    target.CmdDestroyHandCard(rand);
                     EffectSpawnSelected(target, true, rand);
                 }
                 else if(rand == 3)
                 {
                     rand = Random.Range(0, target.field.Length);
-                    target.field[rand] = null;
+                    target.CmdDestroyFieldCard(rand);
                     EffectSpawnSelected(target, false, rand);
                 }
                 break;
@@ -170,26 +170,23 @@ public class FieldCard : BaseCard
                     if(target.field[i] == null)
                     {
                         target.CmdPlayCard(new CardInfo(spawn), i);
-                        target.field[i].cardPosition = i;
                         EffectSpawnSelected(target, false, i);
                     }
                 }
                 break;
             case Ability.StealCard:
                 EffectSpawn(player);
-                if(target.deck.Count > 0)
+                if(target.deckSize > 0)
                 {
                     player.CmdPlayCard(target.deck.Dequeue(), cardPosition);
-                    player.field[cardPosition].cardPosition = cardPosition;
                     Destroy(gameObject);
                 }
                 break;
             case Ability.DeckCard:
                 EffectSpawn(player);
-                if(player.deck.Count > 0)
+                if(player.deckSize > 0)
                 {
                     player.CmdPlayCard(player.deck.Dequeue(), cardPosition);
-                    player.field[cardPosition].cardPosition = cardPosition;
                     Destroy(gameObject);
                 }
                 break;
