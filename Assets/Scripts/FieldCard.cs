@@ -213,11 +213,8 @@ public class FieldCard : BaseCard
         int rightDamage = attackPattern[3];
         int farRightDamage = attackPattern[4];
 
-        Debug.Log(farLeftDamage + "/" + leftDamage + "/" + mainDamage + "/" + rightDamage + "/" + farRightDamage);
-
         for(int i = 0; i < 5; i++)
         {
-            Debug.Log(i);
             if(target.field[i] != null)
             {
                 int damage = 0;
@@ -243,29 +240,24 @@ public class FieldCard : BaseCard
             {
                 if(i == cardPosition - 2 && farLeftDamage > 0)
                 {
-                    Debug.Log("fld" + farLeftDamage);
                     target.hp -= farLeftDamage;
                     AttackSetup(player,target, i);
                 }
                 else if(i == cardPosition - 1 && leftDamage > 0)
                 {
-                    Debug.Log("left" + leftDamage);
                     target.hp -= leftDamage;
                     AttackSetup(player, target, i);
                 }
                 else if(i == cardPosition && mainDamage > 0)
                 {
-                    Debug.Log("main" + mainDamage);
                     target.hp -= mainDamage;
                     AttackSetup(player, target, i);
                 }
                 else if(i == cardPosition + 1 && rightDamage > 0){
-                    Debug.Log("right" + rightDamage);
                     target.hp -= rightDamage;
                     AttackSetup(player, target, i);
                 }
                 else if(i == cardPosition + 2 && farRightDamage > 0){
-                    Debug.Log("frd" + farRightDamage);
                     target.hp -= farRightDamage;
                     AttackSetup(player, target, i);
                 }
@@ -277,7 +269,7 @@ public class FieldCard : BaseCard
     {
         var attack = Instantiate(effect, transform.position, Quaternion.identity);
         attack.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(4).GetChild(i).position;
+        attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).localPosition;
         attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
     }
 

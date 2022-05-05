@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
+using System.Linq;
 
 public class DeckBuilder : MonoBehaviour
 {
@@ -32,13 +33,16 @@ public class DeckBuilder : MonoBehaviour
 
     public void BuildDeck()
     {
+        List<ScriptableCard> temp = new List<ScriptableCard>();
         for(int i = 0; i < cards.Length; i++)
         {
             for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
             {
-                Deck.Add(cards[i].GetComponent<CardHolder>().card);
+                temp.Add(cards[i].GetComponent<CardHolder>().card);
             }
         }
+        System.Random rng = new System.Random();
+        Deck = temp.OrderBy(x => rng.Next()).ToList();
     }
 
     public void CloseCanvas()

@@ -53,7 +53,6 @@ public class PlayerManager : NetworkBehaviour
     public CurrentCard currentCard;
     public Sprite CardBack;
     public GameObject endTurnButton;
-
     void UpdatePlayerName(string oldUser, string newUser)
     {
         username = newUser;
@@ -189,7 +188,6 @@ public class PlayerManager : NetworkBehaviour
             }   
         } 
     }
-
     public void SelectFieldCard(int index)
     {   
         currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
@@ -201,14 +199,12 @@ public class PlayerManager : NetworkBehaviour
     }
     public void Draw() 
     {
-        Debug.Log("Drawing");
         if(deck.Count > 0)
         {
             for(int i = 0; i < hand.Length; i++)
             {
                 if(hand[i] == null)
                 {
-                    Debug.Log("Drawing");
                     CmdAddCard(deck.Dequeue(), i);
                     return;
                 }
@@ -226,11 +222,11 @@ public class PlayerManager : NetworkBehaviour
     {
         RpcUpdatePlayerText(u,h,s,d);
     }
-    [Command] public void CmdDestroyHandCard(int index)
+    [Command(requiresAuthority = false)] public void CmdDestroyHandCard(int index)
     {
         RpcDestroyHandCard(index);
     }
-    [Command] public void CmdDestroyFieldCard(int index)
+    [Command(requiresAuthority = false)] public void CmdDestroyFieldCard(int index)
     {
         RpcDestroyFieldCard(index);
     }
@@ -275,7 +271,7 @@ public class PlayerManager : NetworkBehaviour
         sp = sum;
         deckSize = deck;
     }
-    [Command] public void CmdSetMana(int value)
+    [Command(requiresAuthority = false)] public void CmdSetMana(int value)
     {
         sp += value;
     }
