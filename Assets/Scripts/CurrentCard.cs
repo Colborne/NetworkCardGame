@@ -6,6 +6,7 @@ public class CurrentCard : MonoBehaviour
 {
     public CardInfo cardData;
     public Sprite portrait;
+    public bool alreadyPlayed;
     void Update()
     {
         Vector2 mousePos = new Vector2(Input.mousePosition.x, Input.mousePosition.y);

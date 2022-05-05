@@ -24,4 +24,5 @@ public struct CardInfo
     public int ability => (int)data.ability;
     public GameObject effect => data.effect;
     public ScriptableCard spawn => data.spawn;
+    public string fusion => data.fusion;
 }

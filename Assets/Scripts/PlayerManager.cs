@@ -144,7 +144,7 @@ public class PlayerManager : NetworkBehaviour
     }
     public void NewTurn()
     {
-        sp++;
+        CmdSetMana(1);
         Draw();
 
         int[] starting = new int[] {0,0,0,0,0};
@@ -167,24 +167,37 @@ public class PlayerManager : NetworkBehaviour
     }
     public void SelectCard(int index)
     {   
-        if(currentCard.portrait != null)
+        if(currentCard.alreadyPlayed == false)
         {
-            if(hand[index] == null)
+            if(currentCard.portrait != null)
             {
-                CmdAddCard(currentCard.cardData, index);
-                currentCard.GetComponent<Image>().enabled = false;
-                currentCard.cardData = new CardInfo();
-                currentCard.portrait = null;
+                if(hand[index] == null)
+                {
+                    CmdAddCard(currentCard.cardData, index);
+                    currentCard.GetComponent<Image>().enabled = false;
+                    currentCard.cardData = new CardInfo();
+                    currentCard.portrait = null;
+                }
             }
-        }
-        else
-        {
-            currentCard.cardData = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData;
-            currentCard.portrait = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData.image;
-            currentCard.GetComponent<Image>().enabled = true;
-            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
-            CmdDestroyHandCard(index);
-        }    
+            else
+            {
+                currentCard.cardData = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData;
+                currentCard.portrait = playerField.transform.GetChild(5).GetChild(index).GetComponentInChildren<HandCard>().cardData.image;
+                currentCard.GetComponent<Image>().enabled = true;
+                currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+                CmdDestroyHandCard(index);
+            }   
+        } 
+    }
+
+    public void SelectFieldCard(int index)
+    {   
+        currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
+        currentCard.portrait = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData.image;
+        currentCard.alreadyPlayed = true;
+        currentCard.GetComponent<Image>().enabled = true;
+        currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+        CmdDestroyFieldCard(index);
     }
     public void Draw() 
     {
@@ -261,6 +274,10 @@ public class PlayerManager : NetworkBehaviour
         hp = health;
         sp = sum;
         deckSize = deck;
+    }
+    [Command] public void CmdSetMana(int value)
+    {
+        sp += value;
     }
     [ClientRpc] public void RpcDestroyHandCard(int index)
     {

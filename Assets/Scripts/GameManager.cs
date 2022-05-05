@@ -21,17 +21,61 @@ public class GameManager : MonoBehaviour
     public void PlayCard(Button button)
     {
         player = PlayerManager.localPlayer;
+        int slot = button.GetComponent<Slot>().slotNumber;
         if(player.isOurTurn)
         {
-            if(player.currentCard.portrait != null)
+            if(player.currentCard.portrait == null)
             {
-                if(player.sp >= player.currentCard.cardData.spr)
+                player.SelectFieldCard(slot);
+            }
+            else
+            {
+                if(player.currentCard.alreadyPlayed)
                 {
-                    player.sp -= player.currentCard.cardData.spr;
-                    player.CmdPlayCard(player.currentCard.cardData, button.GetComponent<Slot>().slotNumber);
-                    player.currentCard.GetComponent<Image>().enabled = false;
-                    player.currentCard.cardData = new CardInfo();
-                    player.currentCard.portrait = null;
+                    if(player.field[slot] == null)
+                    {
+                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.currentCard.GetComponent<Image>().enabled = false;
+                        player.currentCard.cardData = new CardInfo();
+                        player.currentCard.portrait = null;
+                        player.currentCard.alreadyPlayed = false;
+                    }
+                    else if(player.currentCard.cardData.fusion == player.field[slot].title)
+                    {
+                        player.CmdPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
+                        player.currentCard.GetComponent<Image>().enabled = false;
+                        player.currentCard.cardData = new CardInfo();
+                        player.currentCard.portrait = null;
+                        player.currentCard.alreadyPlayed = false;
+                    }
+                    return;
+                }
+                
+                int spr = player.currentCard.cardData.spr;
+                int fieldSp = player.field[slot] != null ? player.field[slot].spr : 0;
+
+                if(fieldSp == 0)
+                {
+                    if(player.sp >= spr)
+                    {
+                        player.CmdSetMana(-spr);
+                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.currentCard.GetComponent<Image>().enabled = false;
+                        player.currentCard.cardData = new CardInfo();
+                        player.currentCard.portrait = null;
+                    }
+                }
+                else
+                {
+                    if(player.sp + fieldSp >= spr)
+                    {
+                        player.CmdSetMana(-Mathf.Max(0, spr - fieldSp));
+                        player.CmdDestroyFieldCard(slot);
+                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.currentCard.GetComponent<Image>().enabled = false;
+                        player.currentCard.cardData = new CardInfo();
+                        player.currentCard.portrait = null;
+                    }
                 }
             }
         }

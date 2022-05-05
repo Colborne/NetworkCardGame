@@ -28,7 +28,7 @@ public class FieldCard : BaseCard
         ClearBoard,
         RemoveCard
     }
-    public bool clicked = false;
+
     public int[] attackPattern;
     public Ability ability;
     public GameObject effect;
@@ -44,7 +44,7 @@ public class FieldCard : BaseCard
             portrait = cardData.image;
             effect = cardData.effect;
             attackPattern = cardData.attackPattern;
-            priority = cardData.ability;
+            priority = (int)ability;
             spawn = cardData.spawn;
             GetComponent<Image>().sprite = portrait;
         }
@@ -99,10 +99,9 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
-                if(spawn != null)
-                {
-                    player.CmdDestroyFieldCard(cardPosition);
+                if(spawn != null){
                     player.CmdPlayCard(new CardInfo(spawn), cardPosition);
+                    player.CmdDestroyFieldCard(cardPosition);
                 }
                 break;
             case Ability.DrainLife:
