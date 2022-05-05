@@ -271,7 +271,7 @@ public class PlayerManager : NetworkBehaviour
         sp = sum;
         deckSize = deck;
     }
-    [Command(requiresAuthority = false)] public void CmdSetMana(int value)
+    [Command] public void CmdSetMana(int value)
     {
         sp += value;
     }

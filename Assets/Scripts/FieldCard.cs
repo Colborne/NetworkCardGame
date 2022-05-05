@@ -46,8 +46,8 @@ public class FieldCard : BaseCard
             attackPattern = cardData.attackPattern;
             priority = (int)ability;
             spawn = cardData.spawn;
-            GetComponent<Image>().sprite = portrait;
         }
+        GetComponent<Image>().sprite = portrait;
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 
@@ -99,10 +99,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
-                if(spawn != null){
-                    player.CmdPlayCard(new CardInfo(spawn), cardPosition);
-                    player.CmdDestroyFieldCard(cardPosition);
-                }
+                CmdUpdateCard();
                 break;
             case Ability.DrainLife:
                 EffectSpawn(player);
@@ -193,15 +190,40 @@ public class FieldCard : BaseCard
     }
 
     [Command(requiresAuthority = false)]
+    public void CmdUpdateCard()
+    {
+        RpcUpdateCard();
+    }
+
+    [ClientRpc]
+    public void RpcUpdateCard()
+    {
+        if(spawn != null)
+        {
+            cardData = new CardInfo(spawn);
+            title = spawn.title;
+            spr = spawn.spr;
+            portrait = spawn.portrait;
+            attackPattern = spawn.attackPattern;
+            ability = (FieldCard.Ability)spawn.ability;
+            effect = spawn.effect;
+            spawn = spawn.spawn;
+            GetComponent<Image>().sprite = portrait;
+        }
+    }
+
+    [Command(requiresAuthority = false)]
     public void CmdHeal(PlayerManager player, int amount)
     {
         player.hp += amount;
+        player.hp = Mathf.Max(0, player.hp);
     }
     
     [Command(requiresAuthority = false)]
     public void CmdMana(PlayerManager player, int amount)
     {
         player.sp += amount;
+        player.sp = Mathf.Max(0, player.sp);
     }
 
     [Command(requiresAuthority = false)]
