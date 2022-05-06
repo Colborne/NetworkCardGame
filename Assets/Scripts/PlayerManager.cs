@@ -264,6 +264,11 @@ public class PlayerManager : NetworkBehaviour
 
         if(isServer) RpcDisplayCard(bc, index);
     }
+
+    [ClientRpc] public void RpcDuplicate(FieldCard fc, int index)
+    {
+
+    }
     [Command] public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
         username = user;

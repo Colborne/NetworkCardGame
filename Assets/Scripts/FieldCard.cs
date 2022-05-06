@@ -84,7 +84,22 @@ public class FieldCard : BaseCard
                 {
                     if(player.field[i] == null)
                     {
-                        player.CmdPlayCard(cardData, i);
+                        GameObject bc = Instantiate(player.cardToSpawn);
+                        FieldCard temp = bc.GetComponent<FieldCard>();
+                        temp.cardData = new CardInfo(this.cardData.data);
+                        temp.title = this.title;
+                        temp.spr = this.spr;
+                        temp.portrait = this.portrait;
+                        temp.attackPattern = this.attackPattern;
+                        temp.ability = this.ability;
+                        temp.cardPosition = i;
+                        temp.effect = this.effect;
+                        temp.spawn = this.spawn;
+                        bc.GetComponent<Image>().sprite = temp.portrait;
+                        player.field[i] = temp;
+                        NetworkServer.Spawn(bc);
+
+                        player.RpcDisplayCard(bc, i);
                         return;
                     }
                 }
