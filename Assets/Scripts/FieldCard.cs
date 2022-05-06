@@ -71,7 +71,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Heal:
                 EffectSpawn(player);
-                CmdHeal(player, spr);
+                player.hp += spr;
                 break;
             case Ability.Summoning:
                 EffectSpawn(player);
