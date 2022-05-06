@@ -47,6 +47,8 @@ public class FieldCard : BaseCard
             priority = (int)ability;
             spawn = cardData.spawn;
         }
+        if(hasAuthority)
+            cardPosition = GetComponentInParent<Slot>().slotNumber;
         GetComponent<Image>().sprite = portrait;
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
@@ -90,12 +92,7 @@ public class FieldCard : BaseCard
             case Ability.Swap:
                 EffectSpawn(player);
                 if(target.field[cardPosition] != null)
-                {
-                    FieldCard temp = target.field[cardPosition];
-                    target.field[cardPosition] = this;
-                    player.field[cardPosition] = temp;
-                    
-                }
+                    player.CmdSwap(this, target.field[cardPosition]);
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
@@ -172,7 +169,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.StealCard:
                 EffectSpawn(player);
-                if(target.deckSize > 0)
+                if(target.deckSize > 1)
                 {
                     player.CmdPlayCard(target.deck.Dequeue(), cardPosition);
                     Destroy(gameObject);
@@ -180,7 +177,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DeckCard:
                 EffectSpawn(player);
-                if(player.deckSize > 0)
+                if(player.deckSize > 1)
                 {
                     player.CmdPlayCard(player.deck.Dequeue(), cardPosition);
                     Destroy(gameObject);
