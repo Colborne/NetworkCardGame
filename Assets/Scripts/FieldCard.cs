@@ -44,6 +44,7 @@ public class FieldCard : BaseCard
             portrait = cardData.image;
             effect = cardData.effect;
             attackPattern = cardData.attackPattern;
+            ability = (FieldCard.Ability)cardData.ability;
             priority = (int)ability;
             spawn = cardData.spawn;
         }
@@ -59,8 +60,6 @@ public class FieldCard : BaseCard
         {
             case Ability.Draw:
                 EffectSpawn(player);
-                for(int i = 0; i < spr; i++)
-                    player.Draw();
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);

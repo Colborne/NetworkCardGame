@@ -144,7 +144,29 @@ public class PlayerManager : NetworkBehaviour
     public void NewTurn()
     {
         CmdSetMana(1);
-        Draw();
+
+        int drawCount = 1;
+        for(int i = 0; i < field.Length; i++)
+        {
+            if(field[i] != null && field[i].ability == FieldCard.Ability.Draw)
+                drawCount += field[i].spr;
+        }
+
+        int drawLeft = drawCount;
+        if(deck.Count > 0)
+        {
+            for(int i = 0; i < hand.Length; i++)
+            {
+                if(hand[i] == null && drawLeft > 0)
+                {
+                    Debug.Log("There is a free spot at " + i);
+                    StartCoroutine(DrawCard(i)); 
+                    drawLeft--;
+                }
+            }
+        }
+        
+        CmdUpdatePlayerText(username,hp,sp,deckSize);
 
         int[] starting = new int[] {0,0,0,0,0};
         
@@ -164,6 +186,12 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
+    IEnumerator DrawCard( int index)
+    {
+        CmdAddCard(deck.Dequeue(), index);
+        yield return new WaitForSeconds(.1f);
+    }
+
     public void SelectCard(int index)
     {   
         if(currentCard.alreadyPlayed == false)
@@ -197,27 +225,7 @@ public class PlayerManager : NetworkBehaviour
         currentCard.GetComponent<Image>().sprite = currentCard.portrait;
         CmdDestroyFieldCard(index);
     }
-    public void Draw() 
-    {
-        if(deck.Count > 0)
-        {
-            for(int i = 0; i < hand.Length; i++)
-            {
-                if(hand[i] == null)
-                {
-                    CmdAddCard(deck.Dequeue(), i);
-                    return;
-                }
-            }
 
-            if(hand.Length < 5)
-            {
-                Array.Resize(ref hand, hand.Length + 1);
-                CmdAddCard(deck.Dequeue(), hand.Length - 1);
-                return;
-            }
-        }
-    }
     [Command] public void CmdUpdatePlayerText(string u, int h, int s, int d)
     {
         RpcUpdatePlayerText(u,h,s,d);
@@ -265,10 +273,6 @@ public class PlayerManager : NetworkBehaviour
         if(isServer) RpcDisplayCard(bc, index);
     }
 
-    [ClientRpc] public void RpcDuplicate(FieldCard fc, int index)
-    {
-
-    }
     [Command] public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
         username = user;
@@ -343,19 +347,19 @@ public class PlayerManager : NetworkBehaviour
                  else
                     localPlayer.field[i] = null;
 
-                if(hasEnemy){
-                if(enemyField.transform.GetChild(5).GetChild(i).childCount > 0)
-                    localPlayer.enemy.hand[i] = enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>();               
-                else
-                    localPlayer.enemy.hand[i] = null;
+                if(hasEnemy)
+                {
+                    if(enemyField.transform.GetChild(5).GetChild(i).childCount > 0)
+                        localPlayer.enemy.hand[i] = enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>();               
+                    else
+                        localPlayer.enemy.hand[i] = null;
 
-                if(enemyField.transform.GetChild(4).GetChild(i).childCount > 0)
-                    localPlayer.enemy.field[i] = enemyField.transform.GetChild(4).GetChild(i).GetChild(0).GetComponent<FieldCard>();                
-                else
-                    localPlayer.enemy.field[i] = null;
+                    if(enemyField.transform.GetChild(4).GetChild(i).childCount > 0)
+                        localPlayer.enemy.field[i] = enemyField.transform.GetChild(4).GetChild(i).GetChild(0).GetComponent<FieldCard>();                
+                    else
+                        localPlayer.enemy.field[i] = null;
                 }
             }
-            
         }
         else
         {
