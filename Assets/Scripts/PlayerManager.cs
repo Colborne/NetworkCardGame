@@ -264,49 +264,6 @@ public class PlayerManager : NetworkBehaviour
 
         if(isServer) RpcDisplayCard(bc, index);
     }
-
-    [Command]
-    public void CmdSwap(FieldCard original, FieldCard swapped)
-    {
-        if(isServer) RpcSwap(original, swapped);
-    }
-
-    [ClientRpc]
-    public void RpcSwap(FieldCard original, FieldCard swapped)
-    {
-        FieldCard temp = new FieldCard();
-        temp.cardData = original.cardData;
-        temp.title = original.cardData.title;
-        temp.spr = original.cardData.spr;
-        temp.portrait = original.cardData.image;
-        temp.cardPosition = original.cardPosition;
-        temp.attackPattern = original.cardData.attackPattern;
-        temp.ability = (FieldCard.Ability)original.cardData.ability;
-        temp.effect = original.cardData.effect;
-        temp.spawn = original.cardData.spawn;
-   
-        original.cardData = swapped.cardData;
-        original.title = swapped.title;
-        original.spr = swapped.spr;
-        original.portrait = swapped.portrait;
-        original.cardPosition = swapped.cardPosition;
-        original.attackPattern = swapped.attackPattern;
-        original.ability = swapped.ability;
-        original.effect = swapped.effect;
-        original.spawn = swapped.spawn;
-        original.GetComponent<Image>().sprite = original.portrait;
-
-        swapped.cardData = temp.cardData;
-        swapped.title = temp.title;
-        swapped.spr = temp.spr;
-        swapped.portrait = temp.portrait;
-        swapped.cardPosition = temp.cardPosition;
-        swapped.attackPattern = temp.attackPattern;
-        swapped.ability = temp.ability;
-        swapped.effect = temp.effect;
-        swapped.spawn = temp.spawn;
-        swapped.GetComponent<Image>().sprite = swapped.portrait;
-    }
     [Command] public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
         username = user;

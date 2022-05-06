@@ -92,7 +92,10 @@ public class FieldCard : BaseCard
             case Ability.Swap:
                 EffectSpawn(player);
                 if(target.field[cardPosition] != null)
-                    player.CmdSwap(this, target.field[cardPosition]);
+                {
+                    player.RpcDisplayCard(target.field[cardPosition].gameObject, cardPosition);
+                    target.RpcDisplayCard(this.gameObject, cardPosition);
+                }
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
