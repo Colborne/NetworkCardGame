@@ -63,11 +63,11 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);
-                CmdHeal(player, -spr);
+                player.hp = Mathf.Max(0, player.hp - spr);
                 player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Damage:
-                CmdDamage(player, target);
+                Damage(player, target);
                 break;
             case Ability.Heal:
                 EffectSpawn(player);
@@ -75,7 +75,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Summoning:
                 EffectSpawn(player);
-                CmdMana(player, spr);
+                player.sp += spr;
                 break;
             case Ability.Duplicate:
                 EffectSpawn(player);
@@ -113,25 +113,36 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Evolve:
                 EffectSpawn(player);
-                CmdUpdateCard();
+                if(spawn != null)
+                {
+                    cardData = new CardInfo(spawn);
+                    title = spawn.title;
+                    spr = spawn.spr;
+                    portrait = spawn.portrait;
+                    attackPattern = spawn.attackPattern;
+                    ability = (FieldCard.Ability)spawn.ability;
+                    effect = spawn.effect;
+                    spawn = spawn.spawn;
+                    GetComponent<Image>().sprite = portrait;
+                }
                 break;
             case Ability.DrainLife:
                 EffectSpawn(player);
-                CmdHeal(target, -spr);
+                player.hp = Mathf.Max(0, player.hp - spr);
                 break;
             case Ability.StealLife:
                 EffectSpawn(player);
-                CmdHeal(target, -1);
-                CmdHeal(player, 1);
+                player.hp = Mathf.Max(0, player.hp - 1);
+                player.hp += 1;
                 break;
             case Ability.DrainMana:
                 EffectSpawn(player);
-                CmdMana(target, -spr);
+                target.sp = Mathf.Max(0, target.sp - spr);
                 break;
             case Ability.StealMana:
                 EffectSpawn(player);
-                CmdMana(target, -1);
-                CmdMana(player, 1);
+                target.sp = Mathf.Max(0, target.sp - 1);
+                player.sp += 1;
                 break;
             case Ability.ClearBoard:
                 for(int i = 0; i < player.hand.Length; i++)
@@ -240,8 +251,7 @@ public class FieldCard : BaseCard
         player.sp = Mathf.Max(0, player.sp);
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdDamage(PlayerManager player, PlayerManager target)
+    public void Damage(PlayerManager player, PlayerManager target)
     {  
         int farLeftDamage = attackPattern[0];
         int leftDamage = attackPattern[1];

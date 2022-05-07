@@ -81,19 +81,6 @@ public class GameManager : MonoBehaviour
         }
     }
 
-    public void DealDamage()
-    {
-        player = PlayerManager.localPlayer;
-        for(int i = 0; i < player.field.Length; i++)
-        {
-            if(player.field[i] != null)
-            {
-                Debug.Log(i);
-                player.field[i].CmdDamage(player, player.enemy);
-            }              
-        }       
-    }
-
     public void EndTurn()
     {
         player = PlayerManager.localPlayer;
