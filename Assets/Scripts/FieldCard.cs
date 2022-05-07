@@ -128,11 +128,11 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DrainLife:
                 EffectSpawn(player);
-                player.hp = Mathf.Max(0, player.hp - spr);
+                target.hp = Mathf.Max(0, target.hp - spr);
                 break;
             case Ability.StealLife:
                 EffectSpawn(player);
-                player.hp = Mathf.Max(0, player.hp - 1);
+                target.hp = Mathf.Max(0, target.hp - 1);
                 player.hp += 1;
                 break;
             case Ability.DrainMana:
@@ -148,13 +148,13 @@ public class FieldCard : BaseCard
                 for(int i = 0; i < player.hand.Length; i++)
                 {
                     player.CmdDestroyHandCard(i);
-                    EffectSpawnSelected(player, true, i);
+                    EffectSpawnSelected(player, false, true, i);
                     player.CmdDestroyFieldCard(i);
-                    EffectSpawnSelected(player, false, i);
+                    EffectSpawnSelected(player, false, false, i);
                     target.CmdDestroyHandCard(i);
-                    EffectSpawnSelected(target, true, i);
+                    EffectSpawnSelected(target, true, true, i);
                     target.CmdDestroyFieldCard(i);
-                    EffectSpawnSelected(target, false, i);
+                    EffectSpawnSelected(target, true, false, i);
                 }
                 break;
             case Ability.RemoveCard:
@@ -164,25 +164,25 @@ public class FieldCard : BaseCard
                 {
                     rand = Random.Range(0, player.hand.Length);
                     player.CmdDestroyHandCard(rand);
-                    EffectSpawnSelected(player, true, rand);
+                    EffectSpawnSelected(player, false, true, rand);
                 }
                 else if(rand == 1)
                 {
                     rand = Random.Range(0, player.field.Length);
                     player.CmdDestroyFieldCard(rand);
-                    EffectSpawnSelected(player, false, rand);
+                    EffectSpawnSelected(player, false, false, rand);
                 }
                 else if(rand == 2)
                 {
                     rand = Random.Range(0, target.hand.Length);
                     target.CmdDestroyHandCard(rand);
-                    EffectSpawnSelected(target, true, rand);
+                    EffectSpawnSelected(target, true, true, rand);
                 }
                 else if(rand == 3)
                 {
                     rand = Random.Range(0, target.field.Length);
                     target.CmdDestroyFieldCard(rand);
-                    EffectSpawnSelected(target, false, rand);
+                    EffectSpawnSelected(target, true, false, rand);
                 }
                 break;
             case Ability.Spawn:
@@ -191,7 +191,7 @@ public class FieldCard : BaseCard
                     if(target.field[i] == null)
                     {
                         target.CmdPlayCard(new CardInfo(spawn), i);
-                        EffectSpawnSelected(target, false, i);
+                        EffectSpawnSelected(target, true, false, i);
                     }
                 }
                 break;
@@ -326,19 +326,37 @@ public class FieldCard : BaseCard
         eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 
-    void EffectSpawnSelected(PlayerManager player, bool isHand, int i)
+    void EffectSpawnSelected(PlayerManager player, bool isenemy, bool isHand, int i)
     {
-        if(isHand)
+        if(isenemy)
         {
-            var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
-            eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-            eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            if(isHand)
+            {
+                var eff = Instantiate(effect, player.enemyField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
+                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            }
+            else
+            {
+                var eff = Instantiate(effect, player.enemyField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
+                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            }
         }
         else
         {
-            var eff = Instantiate(effect, player.playerField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
-            eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-            eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            if(isHand)
+            {
+                var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
+                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            }
+            else
+            {
+                var eff = Instantiate(effect, player.playerField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
+                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+            }
         }
     }
 }
