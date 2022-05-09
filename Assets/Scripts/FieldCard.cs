@@ -31,8 +31,9 @@ public class FieldCard : BaseCard
         Freeze,
         Rearrange,
         DeckBurn,
-        ClearField
-
+        ClearField,
+        Rot,
+        Sight
     }
 
     public int[] attackPattern;
@@ -41,7 +42,8 @@ public class FieldCard : BaseCard
     public ScriptableCard spawn;
     public int priority;
     public int defense;
-
+    public int rotting;
+    public int frozen;
     public override void Update()
     {
         if(title == "")
@@ -211,14 +213,6 @@ public class FieldCard : BaseCard
                     }
                 }
                 break;
-            case Ability.StealCard:
-                EffectSpawn(player);
-                if(target.deckSize > 1)
-                {
-                    player.CmdPlayCard(target.deck.Dequeue(), cardPosition);
-                    Destroy(gameObject);
-                }
-                break;
             case Ability.DeckCard:
                 EffectSpawn(player);
                 if(player.deckSize > 1)
@@ -232,80 +226,154 @@ public class FieldCard : BaseCard
                 for(int i = 0; i < 5; i++)
                     DefendSetup(player, i);
                 break;
-            case Ability.Freeze:
-                break;
             case Ability.DeckBurn:
                 for(int i = 0; i < spr/2; i++)
                     target.deck.Dequeue();
                 break;
             case Ability.Rearrange:
-                List<FieldCard> fc = new List<FieldCard>();
-                
-                for(int i = 0; i < 5; i++)
-                    fc.Add(target.field[i]);
-                
                 System.Random rng = new System.Random();
-                List<FieldCard> listCards = fc.OrderBy(x => rng.Next()).ToList();
+                int[] isCard = new int[5] {0,0,0,0,0};
+                List<FieldCard> fc = new List<FieldCard>();
+               
+               for(int i = 0; i < 5; i++)
+                {
+                    if(target.field[i] != null)
+                    {
+                        isCard[i] = 1;
+                        fc.Add(target.field[i]);
+                        Destroy(target.field[i].gameObject);
+                        target.field[i] = null;
+                    }
+                }
+
+                isCard = isCard.OrderBy(x => rng.Next()).ToArray();
+                fc = fc.OrderBy(x => rng.Next()).ToList();
                 
                 for(int i = 0; i < 5; i++)
                 {
-                    target.CmdDestroyFieldCard(i);
-                    target.CmdPlayCard(listCards[i].cardData, i);
+                    if(isCard[i] == 1)
+                    {
+                        var t = fc[Random.Range(0, fc.Count)];
+                        target.CmdPlayCard(t.cardData,i);
+                        fc.Remove(t);
+                    }               
                 }
-            
+                break;
+            case Ability.Freeze:
+                break;
+            case Ability.Rot:
+                player.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(player, false, false, cardPosition);
+                target.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(target, true, false, cardPosition);
+                break;
+            case Ability.Sacrifice:
+                break;
+            case Ability.Sight:
+                if(target.hand[cardPosition] != null)
+                {
+                    target.hand[cardPosition].GetComponent<Image>().sprite = target.hand[cardPosition].portrait; 
+                    target.hand[cardPosition].seen = true;
+                }
+                EffectSpawn(player);
                 break;
         }
     }
 
     public void Damage(PlayerManager player, PlayerManager target)
     {  
-        int farLeftDamage = attackPattern[0];
-        int leftDamage = attackPattern[1];
-        int mainDamage = attackPattern[2];
-        int rightDamage = attackPattern[3];
-        int farRightDamage = attackPattern[4];
+        int[] actualAttack = new int[5]{0,0,0,0,0};
 
+        if(cardPosition - 2 >= 0 && cardPosition - 2 < 5)   actualAttack[cardPosition - 2] = attackPattern[0];
+        if(cardPosition - 1 >= 0 && cardPosition - 1 < 5)   actualAttack[cardPosition - 1] = attackPattern[1];
+        if(cardPosition >= 0 && cardPosition < 5)           actualAttack[cardPosition] = attackPattern[2];
+        if(cardPosition + 1 >= 0 && cardPosition + 1 < 5)   actualAttack[cardPosition + 1] = attackPattern[3];
+        if(cardPosition + 2 >= 0 && cardPosition + 2 < 5)   actualAttack[cardPosition + 2] = attackPattern[4];
+
+        int totalDamage = 0;
         for(int i = 0; i < 5; i++)
-        {
-            if(attackPattern[i] != 0)
-                AttackSetup(player, target, i);
-            
+        {  
             if(target.field[i] != null)
             {
                 int damage = 0;
-
-                if(i == cardPosition - 2 && farLeftDamage > 0)
-                    damage = Mathf.Max(0, farLeftDamage - target.field[i].spr - target.field[i].defense);
-                else if(i == cardPosition - 1 && leftDamage > 0)
-                    damage = Mathf.Max(0, leftDamage - target.field[i].spr - target.field[i].defense);
-                else if(i == cardPosition && mainDamage > 0)
-                    damage = Mathf.Max(0, mainDamage - target.field[i].spr - target.field[i].defense);
-                else if(i == cardPosition + 1 && rightDamage > 0)
-                    damage = Mathf.Max(0, rightDamage - target.field[i].spr - target.field[i].defense);
-                else if(i == cardPosition + 2 && farRightDamage > 0)
-                    damage = Mathf.Max(0, farRightDamage - target.field[i].spr - target.field[i].defense);
+                if(cardPosition - 2 == i && actualAttack[i] > 0)
+                {
+                    damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
+                    AttackSetup(player, target, i);
+                    totalDamage += damage;
+                }
+                else if(cardPosition - 1 == i && actualAttack[i] > 0)
+                {
+                    damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
+                    AttackSetup(player, target, i);
+                    totalDamage += damage;
+                }
+                else if(cardPosition == i && actualAttack[i] > 0)
+                {
+                    damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
+                    AttackSetup(player, target, i);
+                    totalDamage += damage;
+                }
+                else if(cardPosition + 1 == i && actualAttack[i] > 0)
+                {
+                    damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
+                    AttackSetup(player, target, i);
+                    totalDamage += damage;
+                }
+                else if(cardPosition + 2 == i && actualAttack[i] > 0)
+                {
+                    damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
+                    AttackSetup(player, target, i);
+                    totalDamage += damage;
+                }
                 
                 if(damage > 0)
                 {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= damage;
                     target.CmdDestroyFieldCard(i);
-                    AttackSetup(player, target, i);
                 }
             }
             else
             {
-                if(i == cardPosition - 2 && farLeftDamage > 0)
-                    target.hp -= farLeftDamage;
-                else if(i == cardPosition - 1 && leftDamage > 0)               
-                    target.hp -= leftDamage; 
-                else if(i == cardPosition && mainDamage > 0)  
-                    target.hp -= mainDamage;       
-                else if(i == cardPosition + 1 && rightDamage > 0)
-                    target.hp -= rightDamage;         
-                else if(i == cardPosition + 2 && farRightDamage > 0)
-                    target.hp -= farRightDamage;            
+                if(cardPosition - 2 == i && actualAttack[i] > 0)
+                {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
+                    target.hp -= actualAttack[i];
+                    totalDamage += actualAttack[i];
+                    AttackSetup(player, target, i);       
+                }
+                else if(cardPosition - 1 == i && actualAttack[i] > 0)
+                {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
+                    target.hp -= actualAttack[i];
+                    totalDamage += actualAttack[i];
+                    AttackSetup(player, target, i);   
+                }
+                else if(cardPosition == i && actualAttack[i] > 0)
+                {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
+                    target.hp -= actualAttack[i];
+                    totalDamage += actualAttack[i];
+                    AttackSetup(player, target, i);   
+                }
+                else if(cardPosition + 1 == i && actualAttack[i] > 0)
+                {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
+                    target.hp -= actualAttack[i];
+                    totalDamage += actualAttack[i];
+                    AttackSetup(player, target, i);   
+                }
+                else if(cardPosition + 2 == i && actualAttack[i] > 0)
+                {
+                    Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
+                    target.hp -= actualAttack[i];
+                    totalDamage += actualAttack[i];
+                    AttackSetup(player, target, i);   
+                }
             }
         }
+        Debug.Log("Total Damage: " + totalDamage);
     }
 
     public void Defend(PlayerManager player)
@@ -343,7 +411,7 @@ public class FieldCard : BaseCard
     {
         var attack = Instantiate(effect, transform.position, Quaternion.identity);
         attack.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).localPosition;
+        attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
         attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
     }
     

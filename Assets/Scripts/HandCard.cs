@@ -6,6 +6,7 @@ using UnityEngine.UI;
 
 public class HandCard : BaseCard
 {
+    [SyncVar] public bool seen;
     public override void Update()
     {
         if(title == "")
@@ -15,6 +16,7 @@ public class HandCard : BaseCard
             portrait = cardData.image;
             GetComponent<Image>().sprite = portrait;
         }
+
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 }

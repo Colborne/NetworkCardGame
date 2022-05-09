@@ -472,6 +472,90 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Effects_17
+      rect:
+        serializedVersion: 2
+        x: 136
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fd56070a445ff049af4a82dc5ceda76
+      internalID: -856254417
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Effects_18
+      rect:
+        serializedVersion: 2
+        x: 144
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: b6996ad27d9f7524faff719ac2cdbd2f
+      internalID: -1761632601
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Effects_19
+      rect:
+        serializedVersion: 2
+        x: 152
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 7e50c44fb893c5447bd8bbc6c408ba6d
+      internalID: -1524183721
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Effects_20
+      rect:
+        serializedVersion: 2
+        x: 160
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9fc8f6afe6bc37249b39d9cebe90a5db
+      internalID: 747786901
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -489,16 +573,20 @@ TextureImporter:
       Effects_13: 1364999667
       Effects_8: 1694239234
       Effects_6: 7522498
+      Effects_20: 747786901
       Effects_5: 192121584
       Effects_11: -384800507
       Effects_12: -1745219104
       Effects_10: 103301988
       Effects_0: -777848490
+      Effects_18: -1761632601
       Effects_14: -676807879
       Effects_16: 745330024
       Effects_7: -1279925866
       Effects_3: -120260058
+      Effects_19: -1524183721
       Effects_4: 366327285
+      Effects_17: -856254417
       Effects_1: 1441340916
   spritePackingTag: 
   pSDRemoveMatte: 0

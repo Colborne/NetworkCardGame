@@ -144,7 +144,6 @@ public class PlayerManager : NetworkBehaviour
     public void NewTurn()
     {
         sp++;
-
         int drawCount = 1;
         for(int i = 0; i < field.Length; i++)
         {
@@ -152,6 +151,8 @@ public class PlayerManager : NetworkBehaviour
                 drawCount += field[i].spr;
             if(field[i] != null)
                 field[i].defense = 0;
+            if(hand[i] != null)
+                hand[i].seen = false;
         }
 
         if(deck.Count > 0)
@@ -183,7 +184,6 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
-
     public void SelectCard(int index)
     {   
         if(currentCard.alreadyPlayed == false)
@@ -238,7 +238,7 @@ public class PlayerManager : NetworkBehaviour
         hc.spr = card.spr;
         hc.portrait = card.image;
         hc.cardPosition = index;
-        bc.GetComponent<Image>().sprite = hc.portrait;
+        bc.GetComponent<Image>().sprite = hc.CardBack;
         hand[index] = hc;
         NetworkServer.Spawn(bc);
 
@@ -311,10 +311,14 @@ public class PlayerManager : NetworkBehaviour
     }
     [ClientRpc] public void RpcDisplayHand(GameObject card, int index)
     {
-        if(hasAuthority)
+        if(hasAuthority){
             card.transform.SetParent(playerField.transform.GetChild(5).GetChild(index), false);
-        else
-            card.transform.SetParent(enemyField.transform.GetChild(5).GetChild(index), false);     
+            card.GetComponent<Image>().sprite = card.GetComponent<HandCard>().portrait;
+        }
+        else{
+            card.transform.SetParent(enemyField.transform.GetChild(5).GetChild(index), false);
+            card.GetComponent<Image>().sprite = card.GetComponent<HandCard>().CardBack;
+        }
     }
     [ClientRpc] public void RpcUpdatePlayerText(string u, int h, int s, int d)
     {
@@ -360,8 +364,11 @@ public class PlayerManager : NetworkBehaviour
 
             for(int i = 0; i < 5; i++)
             {
-                if(enemyField.transform.GetChild(5).GetChild(i).childCount > 0)
+                if(enemyField.transform.GetChild(5).GetChild(i).childCount > 0){
                     enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<Image>().sprite = CardBack;
+                    if(enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>().seen)
+                        enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<Image>().sprite = enemyField.transform.GetChild(5).GetChild(i).GetChild(0).GetComponent<HandCard>().portrait;
+                }
             }
         }
     }
