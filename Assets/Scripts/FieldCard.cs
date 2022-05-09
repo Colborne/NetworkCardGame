@@ -270,19 +270,17 @@ public class FieldCard : BaseCard
             if(target.field[i] != null)
             {
                 int damage = 0;
-                if(attackPattern[i] > 0)
-                {
-                    if(i == cardPosition - 2)
-                        damage = Mathf.Max(0, farLeftDamage - target.field[i].spr - target.field[i].defense);
-                    else if(i == cardPosition - 1)
-                        damage = Mathf.Max(0, leftDamage - target.field[i].spr - target.field[i].defense);
-                    else if(i == cardPosition)
-                        damage = Mathf.Max(0, mainDamage - target.field[i].spr - target.field[i].defense);
-                    else if(i == cardPosition + 1)
-                        damage = Mathf.Max(0, rightDamage - target.field[i].spr - target.field[i].defense);
-                    else if(i == cardPosition + 2)
-                        damage = Mathf.Max(0, farRightDamage - target.field[i].spr - target.field[i].defense);
-                }
+
+                if(i == cardPosition - 2 && farLeftDamage > 0)
+                    damage = Mathf.Max(0, farLeftDamage - target.field[i].spr - target.field[i].defense);
+                else if(i == cardPosition - 1 && leftDamage > 0)
+                    damage = Mathf.Max(0, leftDamage - target.field[i].spr - target.field[i].defense);
+                else if(i == cardPosition && mainDamage > 0)
+                    damage = Mathf.Max(0, mainDamage - target.field[i].spr - target.field[i].defense);
+                else if(i == cardPosition + 1 && rightDamage > 0)
+                    damage = Mathf.Max(0, rightDamage - target.field[i].spr - target.field[i].defense);
+                else if(i == cardPosition + 2&& farRightDamage > 0)
+                    damage = Mathf.Max(0, farRightDamage - target.field[i].spr - target.field[i].defense);
                 
                 if(damage > 0)
                 {
