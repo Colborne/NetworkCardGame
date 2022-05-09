@@ -267,6 +267,9 @@ public class FieldCard : BaseCard
 
         for(int i = 0; i < 5; i++)
         {
+            if(attackPattern[i] != 0)
+                AttackSetup(player, target, i);
+            
             if(target.field[i] != null)
             {
                 int damage = 0;
@@ -279,7 +282,7 @@ public class FieldCard : BaseCard
                     damage = Mathf.Max(0, mainDamage - target.field[i].spr - target.field[i].defense);
                 else if(i == cardPosition + 1 && rightDamage > 0)
                     damage = Mathf.Max(0, rightDamage - target.field[i].spr - target.field[i].defense);
-                else if(i == cardPosition + 2&& farRightDamage > 0)
+                else if(i == cardPosition + 2 && farRightDamage > 0)
                     damage = Mathf.Max(0, farRightDamage - target.field[i].spr - target.field[i].defense);
                 
                 if(damage > 0)
@@ -288,33 +291,19 @@ public class FieldCard : BaseCard
                     target.CmdDestroyFieldCard(i);
                     AttackSetup(player, target, i);
                 }
-                
             }
             else
             {
                 if(i == cardPosition - 2 && farLeftDamage > 0)
-                {
                     target.hp -= farLeftDamage;
-                    AttackSetup(player,target, i);
-                }
-                else if(i == cardPosition - 1 && leftDamage > 0)
-                {
-                    target.hp -= leftDamage;
-                    AttackSetup(player, target, i);
-                }
-                else if(i == cardPosition && mainDamage > 0)
-                {
-                    target.hp -= mainDamage;
-                    AttackSetup(player, target, i);
-                }
-                else if(i == cardPosition + 1 && rightDamage > 0){
-                    target.hp -= rightDamage;
-                    AttackSetup(player, target, i);
-                }
-                else if(i == cardPosition + 2 && farRightDamage > 0){
-                    target.hp -= farRightDamage;
-                    AttackSetup(player, target, i);
-                }
+                else if(i == cardPosition - 1 && leftDamage > 0)               
+                    target.hp -= leftDamage; 
+                else if(i == cardPosition && mainDamage > 0)  
+                    target.hp -= mainDamage;       
+                else if(i == cardPosition + 1 && rightDamage > 0)
+                    target.hp -= rightDamage;         
+                else if(i == cardPosition + 2 && farRightDamage > 0)
+                    target.hp -= farRightDamage;            
             }
         }
     }
