@@ -299,31 +299,31 @@ public class FieldCard : BaseCard
                 if(cardPosition - 2 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, target, i);
+                    AttackSetup(player, i);   
                     totalDamage += damage;
                 }
                 else if(cardPosition - 1 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, target, i);
+                    AttackSetup(player, i);   
                     totalDamage += damage;
                 }
                 else if(cardPosition == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, target, i);
+                    AttackSetup(player, i);   
                     totalDamage += damage;
                 }
                 else if(cardPosition + 1 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, target, i);
+                    AttackSetup(player, i);   
                     totalDamage += damage;
                 }
                 else if(cardPosition + 2 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, target, i);
+                    AttackSetup(player, i);   
                     totalDamage += damage;
                 }
                 
@@ -341,35 +341,35 @@ public class FieldCard : BaseCard
                     Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, target, i);       
+                    AttackSetup(player, i);       
                 }
                 else if(cardPosition - 1 == i && actualAttack[i] > 0)
                 {
                     Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, target, i);   
+                    AttackSetup(player, i);   
                 }
                 else if(cardPosition == i && actualAttack[i] > 0)
                 {
                     Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, target, i);   
+                    AttackSetup(player, i);   
                 }
                 else if(cardPosition + 1 == i && actualAttack[i] > 0)
                 {
                     Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, target, i);   
+                    AttackSetup(player, i);   
                 }
                 else if(cardPosition + 2 == i && actualAttack[i] > 0)
                 {
                     Debug.Log("attacking " + i + " for " + actualAttack[i] + " damage");
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, target, i);   
+                    AttackSetup(player, i);   
                 }
             }
         }
@@ -407,10 +407,9 @@ public class FieldCard : BaseCard
         }
     }
     
-    void AttackSetup(PlayerManager player, PlayerManager target, int i) 
+    void AttackSetup(PlayerManager player, int i) 
     {
         var attack = Instantiate(effect, transform.position, Quaternion.identity);
-        attack.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
         attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
         attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
     }
