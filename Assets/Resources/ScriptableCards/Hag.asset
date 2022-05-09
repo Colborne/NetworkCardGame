@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02dea53d35dbc5418162dbca99c526c, type: 3}
-  m_Name: Bomb
+  m_Name: Hag
   m_EditorClassIdentifier: 
-  cardID: 17
-  title: Bomb
-  spr: 1
-  portrait: {fileID: -1813424044, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  cardID: 39
+  title: Hag
+  spr: 4
+  portrait: {fileID: 70058344, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 1
-  effect: {fileID: 6245953675364399562, guid: 3cd9c2c717f26d34281163ab928b6c83, type: 3}
-  spawn: {fileID: 11400000, guid: f7c07361517935a4e906045f7ceb2485, type: 2}
-  fusion: Pirate
+  ability: 21
+  effect: {fileID: 6245953675364399562, guid: 6d0eee1436aadad4d894f051deffa263, type: 3}
+  spawn: {fileID: 0}
+  fusion: 

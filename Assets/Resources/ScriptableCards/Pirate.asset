@@ -19,4 +19,5 @@ MonoBehaviour:
   attackPattern: 
   ability: 14
   effect: {fileID: 6245953675364399562, guid: 9e84a4d632a1c6d4bb132245974637c3, type: 3}
-  spawn: {fileID: 0}
+  spawn: {fileID: 11400000, guid: f7c07361517935a4e906045f7ceb2485, type: 2}
+  fusion: Bomb

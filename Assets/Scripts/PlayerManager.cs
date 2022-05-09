@@ -143,33 +143,30 @@ public class PlayerManager : NetworkBehaviour
     }
     public void NewTurn()
     {
-        CmdSetMana(1);
+        sp++;
 
         int drawCount = 1;
         for(int i = 0; i < field.Length; i++)
         {
             if(field[i] != null && field[i].ability == FieldCard.Ability.Draw)
                 drawCount += field[i].spr;
+            if(field[i] != null)
+                field[i].defense = 0;
         }
 
-        int drawLeft = drawCount;
         if(deck.Count > 0)
         {
             for(int i = 0; i < hand.Length; i++)
             {
-                if(hand[i] == null && drawLeft > 0)
+                if(hand[i] == null && drawCount > 0)
                 {
-                    Debug.Log("There is a free spot at " + i);
-                    StartCoroutine(DrawCard(i)); 
-                    drawLeft--;
+                    CmdAddCard(deck.Dequeue(), i);
+                    drawCount--;
                 }
             }
         }
-        
-        CmdUpdatePlayerText(username,hp,sp,deckSize);
 
-        int[] starting = new int[] {0,0,0,0,0};
-        
+        int[] starting = new int[] {0,0,0,0,0}; 
         for(int i = 0; i < field.Length; i++)
         {
             if(field[i] != null)
@@ -185,11 +182,6 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
-    }
-    IEnumerator DrawCard( int index)
-    {
-        CmdAddCard(deck.Dequeue(), index);
-        yield return new WaitForSeconds(.1f);
     }
 
     public void SelectCard(int index)
@@ -225,7 +217,6 @@ public class PlayerManager : NetworkBehaviour
         currentCard.GetComponent<Image>().sprite = currentCard.portrait;
         CmdDestroyFieldCard(index);
     }
-
     [Command] public void CmdUpdatePlayerText(string u, int h, int s, int d)
     {
         RpcUpdatePlayerText(u,h,s,d);
@@ -272,7 +263,6 @@ public class PlayerManager : NetworkBehaviour
 
         if(isServer) RpcDisplayCard(bc, index);
     }
-
     [Command] public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
         username = user;

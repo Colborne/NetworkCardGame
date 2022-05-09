@@ -37,9 +37,7 @@ public class DeckBuilder : MonoBehaviour
         for(int i = 0; i < cards.Length; i++)
         {
             for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
-            {
                 temp.Add(cards[i].GetComponent<CardHolder>().card);
-            }
         }
         System.Random rng = new System.Random();
         Deck = temp.OrderBy(x => rng.Next()).ToList();

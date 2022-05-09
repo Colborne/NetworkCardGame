@@ -42,6 +42,7 @@ public class GameManager : MonoBehaviour
                     }
                     else if(player.currentCard.cardData.fusion == player.field[slot].title)
                     {
+                        player.CmdDestroyFieldCard(slot);
                         player.CmdPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
                         player.currentCard.GetComponent<Image>().enabled = false;
                         player.currentCard.cardData = new CardInfo();

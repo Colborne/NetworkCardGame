@@ -451,6 +451,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Effects_16
+      rect:
+        serializedVersion: 2
+        x: 128
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 59da9caef7c0ba34493508cc271f1050
+      internalID: 745330024
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -474,6 +495,7 @@ TextureImporter:
       Effects_10: 103301988
       Effects_0: -777848490
       Effects_14: -676807879
+      Effects_16: 745330024
       Effects_7: -1279925866
       Effects_3: -120260058
       Effects_4: 366327285
