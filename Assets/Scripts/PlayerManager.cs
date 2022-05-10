@@ -184,6 +184,79 @@ public class PlayerManager : NetworkBehaviour
             }
         }
     }
+    public void EndTurn()
+    {
+        for(int i = 0; i < 5; i++)
+        {
+            if(field[i] != null)
+            {
+                if(field[i].rotPosition == field[i].cardPosition && field[i].rot)
+                {
+                    CmdDestroyFieldCard(i);
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+                else
+                {
+                    field[i].rot = false;
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+                if(field[i].frozenTime > 0)
+                    field[i].frozenTime--;
+                if(field[i].frozenTime == 0)
+                {
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+                if(field[i].ability == FieldCard.Ability.Defend)
+                    field[i].EffectSpawn(localPlayer);
+            }
+            else if(enemy.field[i] != null)
+            {
+                if(enemy.field[i].frozenTime == 0)
+                {
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == enemy.field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+                if(enemy.field[i].rotPosition == enemy.field[i].cardPosition && enemy.field[i].rot)
+                {
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == enemy.field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+                else
+                {
+                    enemy.field[i].rot = false;
+                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
+                    foreach(LingeringEffect eff in effects)
+                    {
+                        if(eff.target == enemy.field[i])
+                            Destroy(eff.gameObject);
+                    }
+                }
+            }
+        }
+    }
     public void SelectCard(int index)
     {   
         if(currentCard.alreadyPlayed == false)

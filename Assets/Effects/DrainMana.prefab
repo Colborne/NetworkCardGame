@@ -12,7 +12,7 @@ GameObject:
   - component: {fileID: 3562532241600248447}
   - component: {fileID: 380560227206200791}
   m_Layer: 0
-  m_Name: DrainLife
+  m_Name: DrainMana
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -1487,7 +1487,7 @@ ParticleSystem:
     uvChannelMask: -1
     rowMode: 1
     sprites:
-    - sprite: {fileID: -607817100, guid: 7023680d0df4c874b9fa93f74ce52989, type: 3}
+    - sprite: {fileID: 1364999667, guid: 7023680d0df4c874b9fa93f74ce52989, type: 3}
     flipU: 0
     flipV: 0
   VelocityModule:

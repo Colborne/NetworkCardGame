@@ -85,47 +85,7 @@ public class GameManager : MonoBehaviour
     public void EndTurn()
     {
         player = PlayerManager.localPlayer;
-
-        for(int i = 0; i < 5; i++)
-        {
-            if(player.field[i] != null)
-            {
-                if(player.field[i].rotPosition == player.field[i].cardPosition && player.field[i].rot)
-                {
-                    player.CmdDestroyFieldCard(i);
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == player.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                else
-                {
-                    player.field[i].rot = false;
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == player.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                if(player.field[i].frozenTime > 0)
-                    player.field[i].frozenTime--;
-                if(player.field[i].frozenTime == 0)
-                {
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == player.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                if(player.field[i].ability == FieldCard.Ability.Defend)
-                    player.field[i].EffectSpawn(player);
-            }
-        }
-
+        player.EndTurn();
         turnManager = FindObjectOfType<TurnManager>();
         turnManager.EndTurn(player, player.enemy);
     }

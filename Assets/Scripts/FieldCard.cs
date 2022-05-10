@@ -230,7 +230,7 @@ public class FieldCard : BaseCard
                 DrainEffectSpawn(player, 3);
                 for(int i = 0; i < spr/2; i++)
                 {
-                    if(target.deckSize > 0)
+                    if(target.deck.Count > 0)
                         target.deck.Dequeue();
                 }
                 break;
