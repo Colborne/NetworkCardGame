@@ -56,9 +56,9 @@ public class FieldCard : BaseCard
             ability = (FieldCard.Ability)cardData.ability;
             priority = (int)ability;
             spawn = cardData.spawn;
-        }
-        if(hasAuthority)
             cardPosition = GetComponentInParent<Slot>().slotNumber;
+        }
+    
         GetComponent<Image>().sprite = portrait;
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
@@ -409,9 +409,18 @@ public class FieldCard : BaseCard
     
     void AttackSetup(PlayerManager player, int i) 
     {
-        var attack = Instantiate(effect, transform.position, Quaternion.identity);
-        attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
-        attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
+        if(transform.parent.parent.parent == player.playerField.transform)
+        {
+            var attack = Instantiate(effect, transform.position, Quaternion.identity);
+            attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
+            attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
+        }
+        else if(transform.parent.parent.parent == player.enemyField.transform)
+        {
+            var attack = Instantiate(effect, transform.position, Quaternion.identity);
+            attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(4).GetChild(i).position;
+            attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
+        }
     }
     
     void DefendSetup(PlayerManager player, int i) 
