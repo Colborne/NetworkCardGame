@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02dea53d35dbc5418162dbca99c526c, type: 3}
-  m_Name: Pirate
+  m_Name: Sarcophagus
   m_EditorClassIdentifier: 
-  cardID: 29
-  title: Pirate
-  spr: 3
-  portrait: {fileID: 1242150330, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  cardID: 43
+  title: Sarcophagus
+  spr: 4
+  portrait: {fileID: 1398436475, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 14
-  effect: {fileID: 6245953675364399562, guid: 136ab2d029501bd41a10d48c55828125, type: 3}
-  spawn: {fileID: 11400000, guid: f7c07361517935a4e906045f7ceb2485, type: 2}
-  fusion: Bomb
+  ability: 19
+  effect: {fileID: 6245953675364399562, guid: 2082857d7cfb5c74aa5649904b278622, type: 3}
+  spawn: {fileID: 0}
+  fusion: 

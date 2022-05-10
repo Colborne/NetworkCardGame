@@ -178,7 +178,7 @@ public class PlayerManager : NetworkBehaviour
         {
             for(int i = 0; i < field.Length; i++)
             {
-                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
+                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount && field[i].frozenTime == 0){
                     field[i].UseAbility(this, enemy);
                 }
             }
@@ -210,12 +210,15 @@ public class PlayerManager : NetworkBehaviour
     }
     public void SelectFieldCard(int index)
     {   
-        currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
-        currentCard.portrait = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData.image;
-        currentCard.alreadyPlayed = true;
-        currentCard.GetComponent<Image>().enabled = true;
-        currentCard.GetComponent<Image>().sprite = currentCard.portrait;
-        CmdDestroyFieldCard(index);
+        if(playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().frozenTime == 0)
+        {
+            currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
+            currentCard.portrait = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData.image;
+            currentCard.alreadyPlayed = true;
+            currentCard.GetComponent<Image>().enabled = true;
+            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+            CmdDestroyFieldCard(index);
+        }
     }
     [Command] public void CmdUpdatePlayerText(string u, int h, int s, int d)
     {

@@ -556,6 +556,48 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: Effects_21
+      rect:
+        serializedVersion: 2
+        x: 168
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 73016e9b8bdcbb0478a5d03046cb5451
+      internalID: -607817100
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: Effects_22
+      rect:
+        serializedVersion: 2
+        x: 176
+        y: 0
+        width: 8
+        height: 8
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: a53dc6da8ff672846aef984687a6bcdb
+      internalID: 997772428
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -567,6 +609,7 @@ TextureImporter:
     weights: []
     secondaryTextures: []
     nameFileIdTable:
+      Effects_21: -607817100
       Effects_9: 675508785
       Effects_2: 31932524
       Effects_15: -833113854
@@ -574,6 +617,7 @@ TextureImporter:
       Effects_8: 1694239234
       Effects_6: 7522498
       Effects_20: 747786901
+      Effects_22: 997772428
       Effects_5: 192121584
       Effects_11: -384800507
       Effects_12: -1745219104
