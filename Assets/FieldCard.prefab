@@ -72,10 +72,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   syncMode: 0
   syncInterval: 0.1
+  cardData:
+    cardID: 0
   title: 
   spr: 0
   portrait: {fileID: 0}
-  clicked: 0
+  selected: 0
+  cardPosition: 0
+  CardBack: {fileID: 0}
+  attackPattern: 
+  ability: 0
+  effect: {fileID: 0}
+  damageSprite: {fileID: 6245953675364399562, guid: 6a2f3353e4a3c68458d49cdc7c6afbfd, type: 3}
+  damageText: {fileID: 2904413573876289108, guid: c2b43aacbbbf8d240b053cf1f2effe85, type: 3}
+  spawn: {fileID: 0}
+  priority: 0
+  defense: 0
+  rotPosition: 0
+  rot: 0
+  frozenTime: 0
 --- !u!222 &2775755398303445406
 CanvasRenderer:
   m_ObjectHideFlags: 0

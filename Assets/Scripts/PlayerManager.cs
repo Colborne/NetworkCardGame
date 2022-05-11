@@ -115,7 +115,13 @@ public class PlayerManager : NetworkBehaviour
 
         if(endTurnButton != null)
             endTurnButton.SetActive(isOurTurn);
+
+        if(hp <= 0)
+        {
+            //You Lose
+        }  
     }
+
     public void UpdateEnemyInfo()
     {
         PlayerManager[] onlinePlayers = FindObjectsOfType<PlayerManager>();

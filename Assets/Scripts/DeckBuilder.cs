@@ -21,7 +21,7 @@ public class DeckBuilder : MonoBehaviour
             Temp += int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text);
         
         if(Temp.ToString() != DeckSize.text)
-            DeckSize.text = "Deck Size: " + Temp.ToString();
+            DeckSize.text = "Deck: " + Temp.ToString() + "/40";
     }
 
     public void SelectCard(TMP_Text _text)
@@ -45,6 +45,18 @@ public class DeckBuilder : MonoBehaviour
 
     public void CloseCanvas()
     {
+        int temp = 0;
+        for(int i = 0; i < cards.Length; i++)
+        {
+            for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
+            {
+                temp++;
+            }
+        }
+
+        if(temp != 40)
+            return;
+
         BuildDeck();
         GetComponent<Canvas>().enabled = false;
     }

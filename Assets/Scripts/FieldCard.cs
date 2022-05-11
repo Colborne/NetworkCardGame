@@ -4,6 +4,7 @@ using UnityEngine;
 using Mirror;
 using UnityEngine.UI;
 using System.Linq;
+using TMPro;
 
 public class FieldCard : BaseCard
 {
@@ -143,8 +144,11 @@ public class FieldCard : BaseCard
                 break;
             case Ability.StealLife:
                 StealEffectSpawn(player, 1);
-                target.hp -= 1;
-                player.hp += 1;
+                if(target.hp >= 1)
+                {
+                    target.hp -= 1;
+                    player.hp += 1;
+                }
                 break;
             case Ability.DrainMana:
                 DrainEffectSpawn(player, 2);
@@ -152,8 +156,11 @@ public class FieldCard : BaseCard
                 break;
             case Ability.StealMana:
                 StealEffectSpawn(player, 2);
-                target.sp -= 1;
-                player.sp += 1;
+                if(target.sp >= 1)
+                {
+                    target.sp -= 1;
+                    player.sp += 1;
+                }
                 break;
             case Ability.ClearBoard:
                 for(int i = 0; i < player.hand.Length; i++)
@@ -321,31 +328,31 @@ public class FieldCard : BaseCard
                 if(cardPosition - 2 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, damage);   
                     totalDamage += damage;
                 }
                 else if(cardPosition - 1 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, damage);   
                     totalDamage += damage;
                 }
                 else if(cardPosition == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, damage);   
                     totalDamage += damage;
                 }
                 else if(cardPosition + 1 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, damage);   
                     totalDamage += damage;
                 }
                 else if(cardPosition + 2 == i && actualAttack[i] > 0)
                 {
                     damage = Mathf.Max(0, actualAttack[i] - target.field[i].spr - target.field[i].defense);
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, damage);   
                     totalDamage += damage;
                 }
                 
@@ -361,31 +368,31 @@ public class FieldCard : BaseCard
                 {
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, i);       
+                    AttackSetup(player, i, actualAttack[i]);       
                 }
                 else if(cardPosition - 1 == i && actualAttack[i] > 0)
                 {
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition == i && actualAttack[i] > 0)
                 {
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition + 1 == i && actualAttack[i] > 0)
                 {
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition + 2 == i && actualAttack[i] > 0)
                 {
                     target.hp -= actualAttack[i];
                     totalDamage += actualAttack[i];
-                    AttackSetup(player, i);   
+                    AttackSetup(player, i, actualAttack[i]);   
                 }
             }
         }
@@ -422,13 +429,13 @@ public class FieldCard : BaseCard
         }
     }
     
-    void AttackSetup(PlayerManager player, int i) 
+    void AttackSetup(PlayerManager player, int i, int damage) 
     {
         if(transform.parent.parent.parent == player.playerField.transform)
         {
             var attack = Instantiate(effect, transform.position, Quaternion.identity);
             attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
-            attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
+            attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         }
         else if(transform.parent.parent.parent == player.enemyField.transform)
         {
