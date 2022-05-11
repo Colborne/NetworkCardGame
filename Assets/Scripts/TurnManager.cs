@@ -2,15 +2,24 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
+using TMPro;
 
 public class TurnManager : NetworkBehaviour
 {
     public PlayerManager playerOne, playerTwo;
     [SyncVar] public int whichPlayer = -1;
     public bool needPlayers = true;
+    public Canvas canvas;
 
     private void Update() 
     {
+
+        if(isServer && isClient && canvas.enabled)
+            canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Client..."; 
+        
+        if(isClientOnly && canvas.enabled)
+            canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Host...";
+
         if(needPlayers)
         {
             if(PlayerManager.localPlayer != null)
@@ -24,12 +33,16 @@ public class TurnManager : NetworkBehaviour
                         needPlayers = false;
                         whichPlayer = 0;
                         playerOne.isOurTurn = true;
+                        canvas.enabled = false;
                     }
                     else return;
                 }
             }
             else return;
         }
+
+
+        
     }
 
     [Command(requiresAuthority = false)]

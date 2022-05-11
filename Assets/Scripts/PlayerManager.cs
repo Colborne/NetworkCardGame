@@ -102,8 +102,10 @@ public class PlayerManager : NetworkBehaviour
     }
     private void Update() 
     {
+        if(!isServer){
         if (!localPlayer)
             return;
+        }
         if(!hasEnemy)
             UpdateEnemyInfo();
 

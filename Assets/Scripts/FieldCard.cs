@@ -358,8 +358,27 @@ public class FieldCard : BaseCard
                 
                 if(damage > 0)
                 {
-                    target.hp -= damage;
-                    target.CmdDestroyFieldCard(i);
+                    bool sacr = false;
+                    int pos = -1;
+                    for(int j = 0; j < 5; j++)
+                    {
+                        if(target.field[j].ability == FieldCard.Ability.Sacrifice)
+                        {
+                            sacr = true;
+                            pos = j;
+                            break;
+                        }                      
+                    }
+
+                    if(sacr == false)
+                    {
+                        target.hp -= damage;
+                        target.CmdDestroyFieldCard(i);
+                    }
+                    else
+                    {
+                        target.CmdDestroyFieldCard(pos);
+                    }
                 }
             }
             else

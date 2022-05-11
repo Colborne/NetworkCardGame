@@ -4,15 +4,19 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
+using Mirror;
 
 public class DeckBuilder : MonoBehaviour
 {
     public TMP_Text DeckSize;
     public Button[] cards;
     public List<ScriptableCard> Deck;
+    NetworkManager manager;
+    public TMP_Text ipaddr;
 
     private void Awake() {
         Deck = new List<ScriptableCard>();
+        manager = FindObjectOfType<NetworkManager>();
     }
     private void Update() 
     {
@@ -43,7 +47,7 @@ public class DeckBuilder : MonoBehaviour
         Deck = temp.OrderBy(x => rng.Next()).ToList();
     }
 
-    public void CloseCanvas()
+    public void Host()
     {
         int temp = 0;
         for(int i = 0; i < cards.Length; i++)
@@ -59,5 +63,26 @@ public class DeckBuilder : MonoBehaviour
 
         BuildDeck();
         GetComponent<Canvas>().enabled = false;
+        manager.StartHost();
+    }
+
+    public void Client()
+    {
+        int temp = 0;
+        for(int i = 0; i < cards.Length; i++)
+        {
+            for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
+            {
+                temp++;
+            }
+        }
+
+        if(temp != 40)
+            return;
+
+        BuildDeck();
+        GetComponent<Canvas>().enabled = false;
+        manager.networkAddress = ipaddr.text;
+        manager.StartClient();
     }
 }
