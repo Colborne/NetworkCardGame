@@ -83,14 +83,14 @@ MonoBehaviour:
   attackPattern: 
   ability: 0
   effect: {fileID: 0}
-  damageSprite: {fileID: 6245953675364399562, guid: 6a2f3353e4a3c68458d49cdc7c6afbfd, type: 3}
-  damageText: {fileID: 2904413573876289108, guid: c2b43aacbbbf8d240b053cf1f2effe85, type: 3}
   spawn: {fileID: 0}
   priority: 0
   defense: 0
   rotPosition: 0
   rot: 0
   frozenTime: 0
+  damagePopup: {fileID: 6358620255359274369, guid: 6480efdbbefbb624fb0aa1c2d08fb2fe, type: 3}
+  frozenEffect: {fileID: 0}
 --- !u!222 &2775755398303445406
 CanvasRenderer:
   m_ObjectHideFlags: 0
