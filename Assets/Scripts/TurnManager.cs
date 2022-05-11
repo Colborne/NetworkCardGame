@@ -10,16 +10,19 @@ public class TurnManager : NetworkBehaviour
     [SyncVar] public int whichPlayer = -1;
     public bool needPlayers = true;
     public Canvas canvas;
+    bool gameStarted = false;
 
     private void Update() 
     {
+        if(isClientOnly && canvas.enabled && !gameStarted)
+        {
+            gameStarted = true;
+            canvas.enabled = false;
+        }
 
-        if(isServer && isClient && canvas.enabled)
+        if(isServer && isClient && canvas.enabled && !gameStarted)
             canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Client..."; 
         
-        if(isClientOnly && canvas.enabled)
-            canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Host...";
-
         if(needPlayers)
         {
             if(PlayerManager.localPlayer != null)
@@ -34,15 +37,13 @@ public class TurnManager : NetworkBehaviour
                         whichPlayer = 0;
                         playerOne.isOurTurn = true;
                         canvas.enabled = false;
+                        gameStarted = true;
                     }
                     else return;
                 }
             }
             else return;
         }
-
-
-        
     }
 
     [Command(requiresAuthority = false)]

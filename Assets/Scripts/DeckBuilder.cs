@@ -12,7 +12,8 @@ public class DeckBuilder : MonoBehaviour
     public Button[] cards;
     public List<ScriptableCard> Deck;
     NetworkManager manager;
-    public TMP_Text ipaddr;
+    public TMP_InputField ipaddr;
+    public bool clientCheck = false;
 
     private void Awake() {
         Deck = new List<ScriptableCard>();
@@ -26,6 +27,12 @@ public class DeckBuilder : MonoBehaviour
         
         if(Temp.ToString() != DeckSize.text)
             DeckSize.text = "Deck: " + Temp.ToString() + "/40";
+
+        if(!GetComponent<Canvas>().enabled && !clientCheck && !NetworkClient.isConnected && !NetworkServer.active)
+        {
+            GameObject.Find("GameState").transform.GetChild(5).gameObject.SetActive(true);
+            GameObject.Find("GameState").transform.GetChild(6).gameObject.SetActive(true);
+        }
     }
 
     public void SelectCard(TMP_Text _text)
@@ -58,8 +65,8 @@ public class DeckBuilder : MonoBehaviour
             }
         }
 
-        if(temp != 40)
-            return;
+        //if(temp != 40)
+            //return;
 
         BuildDeck();
         GetComponent<Canvas>().enabled = false;
@@ -77,12 +84,48 @@ public class DeckBuilder : MonoBehaviour
             }
         }
 
-        if(temp != 40)
-            return;
+        // if(temp != 40)
+        //    return;
 
         BuildDeck();
+
+        if(ipaddr.text == string.Empty)
+            ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
+
         GetComponent<Canvas>().enabled = false;
+        AttemptClient();
+    }
+
+    public void AttemptClient()
+    {
+        GameObject.Find("GameState").GetComponentInChildren<TMP_Text>().text = "Waiting for [" + manager.networkAddress + "]...";
+        if (!NetworkClient.isConnected && !NetworkServer.active)
+        {
+            ClientConnection();
+        }
+
+        if (NetworkClient.isConnected && !NetworkClient.ready)
+        {
+            if (GUILayout.Button("Client Ready"))
+            {
+                NetworkClient.Ready();
+                if (NetworkClient.localPlayer == null)
+                {
+                    NetworkClient.AddPlayer();
+                    GameObject.Find("GameState").SetActive(false);
+                }
+            }
+        }
+
+        
+    }
+
+    public void ClientConnection()
+    {
+        if (!NetworkClient.active)
+        {
+            manager.StartClient();
+        }
         manager.networkAddress = ipaddr.text;
-        manager.StartClient();
     }
 }

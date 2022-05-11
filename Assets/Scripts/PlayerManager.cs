@@ -102,9 +102,10 @@ public class PlayerManager : NetworkBehaviour
     }
     private void Update() 
     {
-        if(!isServer){
-        if (!localPlayer)
-            return;
+        if(!isServer)
+        {
+            if (!localPlayer)
+                return;
         }
         if(!hasEnemy)
             UpdateEnemyInfo();
@@ -120,7 +121,20 @@ public class PlayerManager : NetworkBehaviour
 
         if(hp <= 0)
         {
-            //You Lose
+            turnManager.canvas.enabled = true;
+            turnManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Lost!";
+            turnManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
+            turnManager.canvas.transform.GetChild(3).gameObject.SetActive(true);
+            turnManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
+        }  
+
+        if(hasEnemy && enemy.hp <= 0)
+        {
+            turnManager.canvas.enabled = true;
+            turnManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Won!";
+            turnManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
+            turnManager.canvas.transform.GetChild(3).gameObject.SetActive(true);
+            turnManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
         }  
     }
 
