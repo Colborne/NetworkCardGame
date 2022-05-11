@@ -5,15 +5,17 @@ using TMPro;
 using UnityEngine.UI;
 using System.Linq;
 using Mirror;
+using UnityEngine.SceneManagement;
 
 public class DeckBuilder : MonoBehaviour
 {
     public TMP_Text DeckSize;
     public Button[] cards;
     public List<ScriptableCard> Deck;
-    NetworkManager manager;
+    public NetworkManager manager;
     public TMP_InputField ipaddr;
     public bool clientCheck = false;
+    public bool isHost = false;
 
     private void Awake() {
         Deck = new List<ScriptableCard>();
@@ -65,9 +67,10 @@ public class DeckBuilder : MonoBehaviour
             }
         }
 
-        //if(temp != 40)
-            //return;
+        if(temp != 40)
+            return;
 
+        isHost = true;
         BuildDeck();
         GetComponent<Canvas>().enabled = false;
         manager.StartHost();
@@ -84,8 +87,8 @@ public class DeckBuilder : MonoBehaviour
             }
         }
 
-        // if(temp != 40)
-        //    return;
+        if(temp != 40)
+            return;
 
         BuildDeck();
 
@@ -116,8 +119,6 @@ public class DeckBuilder : MonoBehaviour
                 }
             }
         }
-
-        
     }
 
     public void ClientConnection()
@@ -127,5 +128,26 @@ public class DeckBuilder : MonoBehaviour
             manager.StartClient();
         }
         manager.networkAddress = ipaddr.text;
+    }
+
+    public void NewDeck()
+    {
+        SceneManager.LoadScene("SampleScene");
+    }
+
+    public void Exit()
+    {
+        Application.Quit();
+    }
+
+    public void Rematch()
+    {
+        Destroy(GameObject.Find("TurnManager").GetComponent<TurnManager>());
+        GameObject.Find("TurnManager").AddComponent<TurnManager>();
+        if(isHost)
+            manager.StartHost();
+        else
+            AttemptClient();
+  
     }
 }

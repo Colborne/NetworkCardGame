@@ -49,7 +49,7 @@ public class PlayerManager : NetworkBehaviour
     [SerializeField] public HandCard[] hand;
     [SerializeField] public FieldCard[] field;
     DeckBuilder deckBuilder;
-    TurnManager turnManager;
+    GameManager gameManager;
     public CurrentCard currentCard;
     public Sprite CardBack;
     public GameObject endTurnButton;
@@ -67,6 +67,7 @@ public class PlayerManager : NetworkBehaviour
         deckBuilder = FindObjectOfType<DeckBuilder>();
         currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
         endTurnButton = GameObject.Find("Canvas/EndTurnButton");
+        gameManager = FindObjectOfType<GameManager>();
         hp = 20;
         sp = 1;
     }
@@ -119,23 +120,35 @@ public class PlayerManager : NetworkBehaviour
         if(endTurnButton != null)
             endTurnButton.SetActive(isOurTurn);
 
-        if(hp <= 0)
+        if(localPlayer.hp <= 0)
         {
-            turnManager.canvas.enabled = true;
-            turnManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Lost!";
-            turnManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
-            turnManager.canvas.transform.GetChild(3).gameObject.SetActive(true);
-            turnManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
-        }  
+            gameManager.canvas.enabled = true;
+            gameManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Lost!";
+            gameManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(5).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(6).gameObject.SetActive(true);
+            Destroy(gameObject);
+            if(isServer)
+                deckBuilder.manager.StopHost();
+            else
+                deckBuilder.manager.StopClient();
+        }
 
-        if(hasEnemy && enemy.hp <= 0)
+        if(enemy != null && enemy.hp <= 0 )
         {
-            turnManager.canvas.enabled = true;
-            turnManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Won!";
-            turnManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
-            turnManager.canvas.transform.GetChild(3).gameObject.SetActive(true);
-            turnManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
-        }  
+            gameManager.canvas.enabled = true;
+            gameManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Won!";
+            gameManager.canvas.transform.GetChild(2).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(5).gameObject.SetActive(true);
+            gameManager.canvas.transform.GetChild(6).gameObject.SetActive(true);
+            Destroy(gameObject);
+            if(isServer)
+                deckBuilder.manager.StopHost();
+            else
+                deckBuilder.manager.StopClient();
+        }
     }
 
     public void UpdateEnemyInfo()

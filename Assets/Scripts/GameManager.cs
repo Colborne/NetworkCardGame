@@ -10,6 +10,7 @@ public class GameManager : MonoBehaviour
 {
     public PlayerManager player;
     public TurnManager turnManager;
+    public Canvas canvas;
  
     public void SelectCard(Button button)
     {

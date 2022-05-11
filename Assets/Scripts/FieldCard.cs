@@ -47,8 +47,6 @@ public class FieldCard : BaseCard
     public int rotPosition;
     public bool rot = false;
     public int frozenTime;
-    public GameObject damagePopup;
-    public GameObject frozenEffect;
     public override void Update()
     {
         if(title == "")
@@ -458,10 +456,6 @@ public class FieldCard : BaseCard
             var attack = Instantiate(effect, transform.position, Quaternion.identity);
             attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
-
-            var dmg = Instantiate(damagePopup, player.enemyField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
-            dmg.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
-            dmg.GetComponentInChildren<TMP_Text>().text = damage.ToString();
         }
         else if(transform.parent.parent.parent == player.enemyField.transform)
         {
