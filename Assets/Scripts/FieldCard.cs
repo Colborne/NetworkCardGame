@@ -287,6 +287,9 @@ public class FieldCard : BaseCard
                 }
                 break;
             case Ability.Sacrifice:
+                player.hp += spr * 2;
+                player.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(player, false, false, cardPosition);
                 break;
             case Ability.Sight:
                 if(target.hand[cardPosition] != null)
@@ -357,28 +360,8 @@ public class FieldCard : BaseCard
                 
                 if(damage > 0)
                 {
-                    bool sacr = false;
-                    int pos = -1;
-                    for(int j = 0; j < 5; j++)
-                    {
-                        if(target.field[j] != null && target.field[j].ability == FieldCard.Ability.Sacrifice)
-                        {
-                            sacr = true;
-                            pos = j;
-                            break;
-                        }                      
-                    }
-
-                    if(sacr == false)
-                    {
-
-                        target.hp -= damage;
-                        target.CmdDestroyFieldCard(i);
-                    }
-                    else
-                    {
-                        target.CmdDestroyFieldCard(pos);
-                    }
+                    target.hp -= damage;
+                    target.CmdDestroyFieldCard(i);
                 }
             }
             else
