@@ -361,7 +361,7 @@ public class FieldCard : BaseCard
                     int pos = -1;
                     for(int j = 0; j < 5; j++)
                     {
-                        if(target.field[j].ability == FieldCard.Ability.Sacrifice)
+                        if(target.field[j] != null && target.field[j].ability == FieldCard.Ability.Sacrifice)
                         {
                             sacr = true;
                             pos = j;
