@@ -216,6 +216,9 @@ public class PlayerManager : NetworkBehaviour
         {
             if(field[i] != null)
             {
+                if(field[i].ability == FieldCard.Ability.DeckCard)
+                    field[i].UseAbility(this, enemy);
+
                 if(field[i].rotPosition == field[i].cardPosition && field[i].rot)
                 {
                     CmdDestroyFieldCard(i);

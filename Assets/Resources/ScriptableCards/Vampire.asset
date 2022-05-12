@@ -17,7 +17,7 @@ MonoBehaviour:
   spr: 3
   portrait: {fileID: -1581076955, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 15
+  ability: 14
   effect: {fileID: 6245953675364399562, guid: 0de4ed415575c11499b02045d40e933c, type: 3}
   spawn: {fileID: 0}
   fusion: 

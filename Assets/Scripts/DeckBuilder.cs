@@ -22,8 +22,11 @@ public class DeckBuilder : MonoBehaviour
         Deck = new List<ScriptableCard>();
         manager = FindObjectOfType<NetworkManager>();
         List<int> cardCount = SaveDeck.Load();
-        for(int i = 0; i < cards.Length; i++)
-            cards[i].GetComponentInChildren<TMP_Text>().text = cardCount[i].ToString();
+        if(cardCount != null)
+        {
+            for(int i = 0; i < cards.Length; i++)
+                cards[i].GetComponentInChildren<TMP_Text>().text = cardCount[i].ToString();
+        }
     }
 
     private void Update() 
@@ -45,7 +48,16 @@ public class DeckBuilder : MonoBehaviour
     public void SelectCard(TMP_Text _text)
     {
         int i = int.Parse(_text.text);
-        i++;
+        if(i < 3)
+            i++;
+        _text.text = (i % 4).ToString();
+    }
+
+    public void DeselectCard(TMP_Text _text)
+    {
+        int i = int.Parse(_text.text);
+        if(i > 0)
+            i--;
         _text.text = (i % 4).ToString();
     }
 
@@ -166,6 +178,5 @@ public class DeckBuilder : MonoBehaviour
             manager.StopClient();
             AttemptClient();
         }
-  
     }
 }

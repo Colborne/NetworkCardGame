@@ -17,7 +17,7 @@ MonoBehaviour:
   spr: 1
   portrait: {fileID: -1813424044, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 1
+  ability: 9
   effect: {fileID: 6245953675364399562, guid: 3cd9c2c717f26d34281163ab928b6c83, type: 3}
   spawn: {fileID: 11400000, guid: f7c07361517935a4e906045f7ceb2485, type: 2}
   fusion: Pirate

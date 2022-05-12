@@ -10,32 +10,31 @@ public class FieldCard : BaseCard
 {
     public enum Ability
     {
+        ClearBoard,
+        ClearField,
+        RemoveCard,
         Swap,
-        Bomb,
+        Rearrange,
         Draw, 
-        StealCard,
-        DeckCard,
-        Sacrifice,
-        Defend,
+        Spawn,   
+        Evolve,
+        Duplicate,
+        Bomb,
         Heal,
         Summoning,
-        Damage,
-        Duplicate,
-        Evolve,
-        Spawn,
         DrainLife,
         StealLife,
         DrainMana,
         StealMana,
-        ClearBoard,
-        RemoveCard,
-        Freeze,
-        Rearrange,
-        DeckBurn,
-        ClearField,
-        Rot,
-        Sight,
-        Blitz
+        Blitz,
+        Damage, //After Healing
+        Freeze, //Order Doesn't Matter
+        DeckBurn, //Order Doesn't Matter
+        Rot, //Order Doesn't Matter
+        Sight, //Order Doesn't Matter
+        Sacrifice, //Happens During Enemy Turn
+        Defend, //Happens During Enemy Turn
+        DeckCard //Happens at End of Turn
     }
 
     public int[] attackPattern;
