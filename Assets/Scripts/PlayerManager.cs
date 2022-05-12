@@ -53,6 +53,7 @@ public class PlayerManager : NetworkBehaviour
     public CurrentCard currentCard;
     public Sprite CardBack;
     public GameObject endTurnButton;
+    public TurnManager turnManager;
     void UpdatePlayerName(string oldUser, string newUser)
     {
         username = newUser;
@@ -68,6 +69,7 @@ public class PlayerManager : NetworkBehaviour
         currentCard = GameObject.Find("CurrentCard").GetComponent<CurrentCard>();
         endTurnButton = GameObject.Find("Canvas/EndTurnButton");
         gameManager = FindObjectOfType<GameManager>();
+        turnManager = FindObjectOfType<TurnManager>();
         hp = 20;
         sp = 1;
     }
@@ -99,7 +101,6 @@ public class PlayerManager : NetworkBehaviour
 
         for(int i = 0; i < 3; i++)
             CmdAddCard(deck.Dequeue(), i); 
-
     }
     private void Update() 
     {
@@ -120,7 +121,7 @@ public class PlayerManager : NetworkBehaviour
         if(endTurnButton != null)
             endTurnButton.SetActive(isOurTurn);
 
-        if(localPlayer.hp <= 0)
+        if(isLocalPlayer && hp <= 0)
         {
             gameManager.canvas.enabled = true;
             gameManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Lost!";
@@ -128,14 +129,9 @@ public class PlayerManager : NetworkBehaviour
             gameManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
             gameManager.canvas.transform.GetChild(5).gameObject.SetActive(true);
             gameManager.canvas.transform.GetChild(6).gameObject.SetActive(true);
-            Destroy(gameObject);
-            if(isServer)
-                deckBuilder.manager.StopHost();
-            else
-                deckBuilder.manager.StopClient();
         }
 
-        if(enemy != null && enemy.hp <= 0 )
+        if(isLocalPlayer && enemy != null && enemy.hp <= 0 )
         {
             gameManager.canvas.enabled = true;
             gameManager.canvas.GetComponentInChildren<TMP_Text>().text = "You Won!";
@@ -143,11 +139,6 @@ public class PlayerManager : NetworkBehaviour
             gameManager.canvas.transform.GetChild(4).gameObject.SetActive(true);
             gameManager.canvas.transform.GetChild(5).gameObject.SetActive(true);
             gameManager.canvas.transform.GetChild(6).gameObject.SetActive(true);
-            Destroy(gameObject);
-            if(isServer)
-                deckBuilder.manager.StopHost();
-            else
-                deckBuilder.manager.StopClient();
         }
     }
 

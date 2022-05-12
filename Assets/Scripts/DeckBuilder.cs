@@ -6,6 +6,7 @@ using UnityEngine.UI;
 using System.Linq;
 using Mirror;
 using UnityEngine.SceneManagement;
+using System.IO;
 
 public class DeckBuilder : MonoBehaviour
 {
@@ -14,13 +15,17 @@ public class DeckBuilder : MonoBehaviour
     public List<ScriptableCard> Deck;
     public NetworkManager manager;
     public TMP_InputField ipaddr;
-    public bool clientCheck = false;
     public bool isHost = false;
 
-    private void Awake() {
+    private void Awake() 
+    {
         Deck = new List<ScriptableCard>();
         manager = FindObjectOfType<NetworkManager>();
+        List<int> cardCount = SaveDeck.Load();
+        for(int i = 0; i < cards.Length; i++)
+            cards[i].GetComponentInChildren<TMP_Text>().text = cardCount[i].ToString();
     }
+
     private void Update() 
     {
         int Temp = 0;
@@ -30,7 +35,7 @@ public class DeckBuilder : MonoBehaviour
         if(Temp.ToString() != DeckSize.text)
             DeckSize.text = "Deck: " + Temp.ToString() + "/40";
 
-        if(!GetComponent<Canvas>().enabled && !clientCheck && !NetworkClient.isConnected && !NetworkServer.active)
+        if(!GetComponent<Canvas>().enabled  && !NetworkClient.isConnected && !NetworkServer.active)
         {
             GameObject.Find("GameState").transform.GetChild(5).gameObject.SetActive(true);
             GameObject.Find("GameState").transform.GetChild(6).gameObject.SetActive(true);
@@ -54,6 +59,11 @@ public class DeckBuilder : MonoBehaviour
         }
         System.Random rng = new System.Random();
         Deck = temp.OrderBy(x => rng.Next()).ToList();
+        
+        List<int> cardCount = new List<int>();
+        for(int i = 0; i < cards.Length; i++)
+            cardCount.Add(int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text));
+        SaveDeck.Save(cardCount);
     }
 
     public void Host()
@@ -92,8 +102,8 @@ public class DeckBuilder : MonoBehaviour
 
         BuildDeck();
 
-        if(ipaddr.text == string.Empty)
-            ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
+        //if(ipaddr.text == string.Empty)
+        //    ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
 
         GetComponent<Canvas>().enabled = false;
         AttemptClient();
@@ -132,6 +142,10 @@ public class DeckBuilder : MonoBehaviour
 
     public void NewDeck()
     {
+        if(isHost)
+            manager.StopHost();
+        else
+            manager.StopClient();
         SceneManager.LoadScene("SampleScene");
     }
 
@@ -141,13 +155,17 @@ public class DeckBuilder : MonoBehaviour
     }
 
     public void Rematch()
-    {
-        Destroy(GameObject.Find("TurnManager").GetComponent<TurnManager>());
-        GameObject.Find("TurnManager").AddComponent<TurnManager>();
+    {            
         if(isHost)
+        {
+            manager.StopHost();
             manager.StartHost();
+        }
         else
+        {
+            manager.StopClient();
             AttemptClient();
+        }
   
     }
 }
