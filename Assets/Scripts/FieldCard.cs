@@ -118,9 +118,28 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(target.field[cardPosition] != null)
                 {
-                    FieldCard Temp = target.field[cardPosition];
-                    target.field[cardPosition] = player.field[cardPosition];
-                    player.field[cardPosition] = Temp;
+                    var trgt = target.field[cardPosition].cardData.data;
+                    var plyr = player.field[cardPosition].cardData.data;
+
+                    target.field[cardPosition].cardData = new CardInfo(plyr);
+                    target.field[cardPosition].title = plyr.title;
+                    target.field[cardPosition].spr = plyr.spr;
+                    target.field[cardPosition].portrait = plyr.portrait;
+                    target.field[cardPosition].attackPattern = plyr.attackPattern;
+                    target.field[cardPosition].ability = (FieldCard.Ability)plyr.ability;
+                    target.field[cardPosition].effect = plyr.effect;
+                    target.field[cardPosition].spawn = plyr.spawn;
+                    GetComponent<Image>().sprite = portrait;
+
+                    player.field[cardPosition].cardData = new CardInfo(trgt);
+                    player.field[cardPosition].title = trgt.title;
+                    player.field[cardPosition].spr = trgt.spr;
+                    player.field[cardPosition].portrait = trgt.portrait;
+                    player.field[cardPosition].attackPattern = trgt.attackPattern;
+                    ability = (FieldCard.Ability)trgt.ability;
+                    player.field[cardPosition].effect = trgt.effect;
+                    player.field[cardPosition].spawn = trgt.spawn;
+                    GetComponent<Image>().sprite = portrait;
 
                     //player.RpcDisplayCard(target.field[cardPosition].gameObject, cardPosition);
                     //target.RpcDisplayCard(this.gameObject, cardPosition);
