@@ -19,7 +19,7 @@ public class FieldCard : BaseCard
         Spawn,   
         Evolve,
         Duplicate,
-        Bomb,
+        Bomb, //Hit before heals and before damage but after swap
         Heal,
         Summoning,
         DrainLife,
@@ -74,7 +74,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);
-                player.hp = Mathf.Max(0, player.hp - spr);
+                player.hp -=spr;
                 player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Damage:
@@ -118,8 +118,12 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(target.field[cardPosition] != null)
                 {
-                    player.RpcDisplayCard(target.field[cardPosition].gameObject, cardPosition);
-                    target.RpcDisplayCard(this.gameObject, cardPosition);
+                    FieldCard Temp = target.field[cardPosition];
+                    target.field[cardPosition] = player.field[cardPosition];
+                    player.field[cardPosition] = Temp;
+
+                    //player.RpcDisplayCard(target.field[cardPosition].gameObject, cardPosition);
+                    //target.RpcDisplayCard(this.gameObject, cardPosition);
                 }
                 break;
             case Ability.Evolve:
@@ -139,7 +143,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DrainLife:
                 DrainEffectSpawn(player, 1);
-                target.hp = Mathf.Max(0, target.hp - spr);
+                target.hp -= spr;
                 break;
             case Ability.StealLife:
                 StealEffectSpawn(player, 1);
@@ -151,7 +155,7 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DrainMana:
                 DrainEffectSpawn(player, 2);
-                target.sp = Mathf.Max(0, target.sp - spr);
+                target.sp -= spr;
                 break;
             case Ability.StealMana:
                 StealEffectSpawn(player, 2);
@@ -274,7 +278,7 @@ public class FieldCard : BaseCard
                 {
                     LingeringEffectSpawnSelected(target.field[cardPosition], false);
                     player.CmdDestroyFieldCard(cardPosition);
-                    target.field[cardPosition].frozenTime = spr/2;   
+                    target.field[cardPosition].frozenTime = spr / 2;   
                 }
                 break;
             case Ability.Rot:

@@ -209,6 +209,16 @@ public class PlayerManager : NetworkBehaviour
                 }
             }
         }
+
+        for(int i = 0; i < field.Length; i++)
+        {
+            if(field[i] != null){
+                if(field[i].ability == FieldCard.Ability.Bomb)
+                    field[i].UseAbility(this, enemy);
+                else
+                    Debug.Log(field[i].ability);
+            }
+        }
     }
     public void EndTurn()
     {
@@ -216,9 +226,6 @@ public class PlayerManager : NetworkBehaviour
         {
             if(field[i] != null)
             {
-                if(field[i].ability == FieldCard.Ability.DeckCard)
-                    field[i].UseAbility(this, enemy);
-
                 if(field[i].rotPosition == field[i].cardPosition && field[i].rot)
                 {
                     CmdDestroyFieldCard(i);
@@ -250,8 +257,21 @@ public class PlayerManager : NetworkBehaviour
                             Destroy(eff.gameObject);
                     }
                 }
+                
                 if(field[i].ability == FieldCard.Ability.Defend)
                     field[i].EffectSpawn(localPlayer);
+                
+                if(field[i].ability == FieldCard.Ability.DeckCard)
+                    field[i].UseAbility(this, enemy);
+                
+                if(field[i].ability == FieldCard.Ability.Sacrifice)
+                    field[i].UseAbility(this, enemy);
+
+                if(field[i].ability == FieldCard.Ability.Blitz)
+                    field[i].UseAbility(this, enemy);
+
+                if(field[i].ability == FieldCard.Ability.Freeze)
+                    field[i].UseAbility(this, enemy);
             }
             else if(enemy.field[i] != null)
             {
