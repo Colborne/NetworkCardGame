@@ -335,9 +335,8 @@ public class FieldCard : BaseCard
                 if(target.field[cardPosition] != null)
                 {
                     player.CmdDestroyFieldCard(cardPosition);
-                    EffectSpawnSelected(player, false, false, cardPosition);
                     target.CmdDestroyFieldCard(cardPosition);
-                    EffectSpawnSelected(target, true, false, cardPosition);
+                    AttackSetup(player, cardPosition, 0); 
                 }
                 break;
         }

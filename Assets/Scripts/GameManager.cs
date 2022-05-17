@@ -86,8 +86,11 @@ public class GameManager : MonoBehaviour
     public void EndTurn()
     {
         player = PlayerManager.localPlayer;
-        player.EndTurn();
-        turnManager = FindObjectOfType<TurnManager>();
-        turnManager.EndTurn(player, player.enemy);
+        if(player.currentCard.portrait == null)
+        {
+            player.EndTurn();
+            turnManager = FindObjectOfType<TurnManager>();
+            turnManager.EndTurn(player, player.enemy);
+        }
     }
 }
