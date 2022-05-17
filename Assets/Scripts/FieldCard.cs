@@ -303,20 +303,31 @@ public class FieldCard : BaseCard
             case Ability.Freeze:
                 if(target.field[cardPosition] != null)
                 {
-                    target.CmdFreeze(cardPosition, spr / 2);
+                    target.CmdFreeze(cardPosition, spr);
                     EffectSpawnSelected(player, false, false, cardPosition);
                     EffectSpawnSelected(target, true, false, cardPosition);
                     player.CmdDestroyFieldCard(cardPosition);   
                 }
                 break;
             case Ability.Rot:
-                if(target.field[cardPosition] != null)
+                target.CmdRot(cardPosition, true);
+                EffectSpawnSelected(player, false, false, cardPosition);
+                EffectSpawnSelected(target, true, false, cardPosition);
+                if (spr == 4)
                 {
-                    target.CmdRot(cardPosition, true);
-                    EffectSpawnSelected(player, false, false, cardPosition);
-                    EffectSpawnSelected(target, true, false, cardPosition);
-                    player.CmdDestroyFieldCard(cardPosition);
+
+                    if(0 <= cardPosition - 1 && cardPosition - 1 <= 4)
+                    {
+                        target.CmdRot(cardPosition - 1, true);
+                        EffectSpawnSelected(target, true, false, cardPosition - 1);
+                    }
+                    if(0 <= cardPosition + 1 && cardPosition + 1 <= 4)
+                    {
+                        target.CmdRot(cardPosition + 1, true);
+                        EffectSpawnSelected(target, true, false, cardPosition + 1);
+                    }
                 }
+                player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Sacrifice:
                 player.hp += spr * 2;
