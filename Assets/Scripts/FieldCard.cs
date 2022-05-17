@@ -179,7 +179,10 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DrainMana:
                 DrainEffectSpawn(player, 2);
-                target.sp -= spr;
+                if(target.sp >= spr)
+                    target.sp -= spr; 
+                else
+                    target.sp = 0;
                 break;
             case Ability.StealMana:
                 StealEffectSpawn(player, 2);
