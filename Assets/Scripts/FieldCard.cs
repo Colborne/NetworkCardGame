@@ -43,9 +43,6 @@ public class FieldCard : BaseCard
     public ScriptableCard spawn;
     public int priority;
     public int defense;
-    public int rotPosition;
-    public bool rot = false;
-    public int frozenTime;
     public override void Update()
     {
         if(title == "")
@@ -63,6 +60,14 @@ public class FieldCard : BaseCard
     
         GetComponent<Image>().sprite = portrait;
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+
+        /*if(frozenTime > 0)
+            GetComponent<Image>().color = new Color32(128,255,225,255);
+        else if(rot && cardPosition == rotPosition)
+            GetComponent<Image>().color = new Color32(0,255,0,255);
+        else
+            GetComponent<Image>().color = new Color32(255,255,255,255);
+    */
     }
 
     public void UseAbility(PlayerManager player, PlayerManager target)
@@ -295,17 +300,19 @@ public class FieldCard : BaseCard
             case Ability.Freeze:
                 if(target.field[cardPosition] != null)
                 {
-                    LingeringEffectSpawnSelected(target.field[cardPosition], false);
-                    player.CmdDestroyFieldCard(cardPosition);
-                    target.field[cardPosition].frozenTime = spr / 2;   
+                    //target.field[cardPosition].frozenTime = spr / 2;
+                    EffectSpawnSelected(player, false, false, cardPosition);
+                    EffectSpawnSelected(target, true, false, cardPosition);
+                    player.CmdDestroyFieldCard(cardPosition);   
                 }
                 break;
             case Ability.Rot:
                 if(target.field[cardPosition] != null)
                 {
-                    target.field[cardPosition].rotPosition = cardPosition;
-                    target.field[cardPosition].rot = true;
-                    LingeringEffectSpawnSelected(target.field[cardPosition], true);
+                    //target.field[cardPosition].rot = true;
+                    //target.field[cardPosition].rotPosition = cardPosition;
+                    EffectSpawnSelected(player, false, false, cardPosition);
+                    EffectSpawnSelected(target, true, false, cardPosition);
                     player.CmdDestroyFieldCard(cardPosition);
                 }
                 break;
@@ -347,7 +354,7 @@ public class FieldCard : BaseCard
         int totalDamage = 0;
         for(int i = 0; i < 5; i++)
         {  
-            if(target.field[i] != null && target.field[i].frozenTime == 0)
+            if(target.field[i] != null)// && target.field[i].frozenTime == 0)
             {
                 int damage = 0;
                 if(cardPosition - 2 == i && actualAttack[i] > 0)
@@ -541,12 +548,5 @@ public class FieldCard : BaseCard
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
         }
-    }
-    void LingeringEffectSpawnSelected(FieldCard fieldCard, bool rot)
-    {
-            var eff = Instantiate(effect, fieldCard.transform.position, Quaternion.identity);
-            eff.GetComponent<LingeringEffect>().rotting = rot;
-            eff.GetComponent<LingeringEffect>().target = fieldCard;
-            eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 }

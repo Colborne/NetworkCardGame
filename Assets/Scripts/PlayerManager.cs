@@ -168,7 +168,10 @@ public class PlayerManager : NetworkBehaviour
         }
     }
     public void NewTurn()
-    {
+    {  
+        if(sp < 0)
+            sp = 0;
+        
         sp++;
         int drawCount = 1;
         for(int i = 0; i < field.Length; i++)
@@ -204,7 +207,7 @@ public class PlayerManager : NetworkBehaviour
         {
             for(int i = 0; i < field.Length; i++)
             {
-                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount && field[i].frozenTime == 0){
+                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
                     field[i].UseAbility(this, enemy);
                 }
             }
@@ -215,8 +218,6 @@ public class PlayerManager : NetworkBehaviour
             if(field[i] != null){
                 if(field[i].ability == FieldCard.Ability.Bomb)
                     field[i].UseAbility(this, enemy);
-                else
-                    Debug.Log(field[i].ability);
             }
         }
     }
@@ -225,39 +226,7 @@ public class PlayerManager : NetworkBehaviour
         for(int i = 0; i < 5; i++)
         {
             if(field[i] != null)
-            {
-                if(field[i].rotPosition == field[i].cardPosition && field[i].rot)
-                {
-                    CmdDestroyFieldCard(i);
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                else
-                {
-                    field[i].rot = false;
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                if(field[i].frozenTime > 0)
-                    field[i].frozenTime--;
-                if(field[i].frozenTime == 0)
-                {
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                
+            {             
                 if(field[i].ability == FieldCard.Ability.Defend)
                     field[i].EffectSpawn(localPlayer);
                 
@@ -272,37 +241,6 @@ public class PlayerManager : NetworkBehaviour
 
                 if(field[i].ability == FieldCard.Ability.Freeze)
                     field[i].UseAbility(this, enemy);
-            }
-            else if(enemy.field[i] != null)
-            {
-                if(enemy.field[i].frozenTime == 0)
-                {
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == enemy.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                if(enemy.field[i].rotPosition == enemy.field[i].cardPosition && enemy.field[i].rot)
-                {
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == enemy.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
-                else
-                {
-                    enemy.field[i].rot = false;
-                    LingeringEffect[] effects = FindObjectsOfType<LingeringEffect>();
-                    foreach(LingeringEffect eff in effects)
-                    {
-                        if(eff.target == enemy.field[i])
-                            Destroy(eff.gameObject);
-                    }
-                }
             }
         }
     }
@@ -332,15 +270,12 @@ public class PlayerManager : NetworkBehaviour
     }
     public void SelectFieldCard(int index)
     {   
-        if(playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().frozenTime == 0)
-        {
-            currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
-            currentCard.portrait = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData.image;
-            currentCard.alreadyPlayed = true;
-            currentCard.GetComponent<Image>().enabled = true;
-            currentCard.GetComponent<Image>().sprite = currentCard.portrait;
-            CmdDestroyFieldCard(index);
-        }
+        currentCard.cardData = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData;
+        currentCard.portrait = playerField.transform.GetChild(4).GetChild(index).GetComponentInChildren<FieldCard>().cardData.image;
+        currentCard.alreadyPlayed = true;
+        currentCard.GetComponent<Image>().enabled = true;
+        currentCard.GetComponent<Image>().sprite = currentCard.portrait;
+        CmdDestroyFieldCard(index);  
     }
     [Command] public void CmdUpdatePlayerText(string u, int h, int s, int d)
     {

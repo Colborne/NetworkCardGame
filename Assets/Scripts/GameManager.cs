@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
                         player.currentCard.portrait = null;
                         player.currentCard.alreadyPlayed = false;
                     }
-                    else if(player.currentCard.cardData.fusion == player.field[slot].title && player.field[slot].frozenTime == 0)
+                    else if(player.currentCard.cardData.fusion == player.field[slot].title)
                     {
                         player.CmdDestroyFieldCard(slot);
                         player.CmdPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    if(player.sp + fieldSp >= spr && player.field[slot].frozenTime == 0)
+                    if(player.sp + fieldSp >= spr)
                     {
                         player.CmdSetMana(-Mathf.Max(0, spr - fieldSp));
                         player.CmdDestroyFieldCard(slot);
