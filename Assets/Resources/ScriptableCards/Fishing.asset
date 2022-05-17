@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02dea53d35dbc5418162dbca99c526c, type: 3}
-  m_Name: Jack-o-Lantern
+  m_Name: Fishing
   m_EditorClassIdentifier: 
-  cardID: 41
-  title: Jack-o-Lantern
-  spr: 2
-  portrait: {fileID: -649580105, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  cardID: 53
+  title: Fishing
+  spr: 3
+  portrait: {fileID: 1041891797, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 20
-  effect: {fileID: 6245953675364399562, guid: b6169691b3a901045b4d423125466f23, type: 3}
+  ability: 10
+  effect: {fileID: 4545312847439962642, guid: 1a1fb9073c13c0e4b8dff838ffafc3cd, type: 3}
   spawn: {fileID: 0}
   fusion: 

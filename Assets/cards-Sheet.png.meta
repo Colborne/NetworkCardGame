@@ -1102,6 +1102,153 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_47
+      rect:
+        serializedVersion: 2
+        x: 1128
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 9b458fc1bc3994c47aecdd4bfcfd08b9
+      internalID: -1819056014
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_48
+      rect:
+        serializedVersion: 2
+        x: 1152
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: e9549fe9e3b290c4da02ebf685d57965
+      internalID: -2003516119
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_49
+      rect:
+        serializedVersion: 2
+        x: 1176
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 013372237e7786140ae16aa7611e2e75
+      internalID: -1883356551
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_50
+      rect:
+        serializedVersion: 2
+        x: 1200
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 4fa41b3b450b91741aded81261e29d26
+      internalID: -87163637
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_51
+      rect:
+        serializedVersion: 2
+        x: 1224
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 25424069e3191e445bdfde5dceba63d2
+      internalID: 1105849745
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_52
+      rect:
+        serializedVersion: 2
+        x: 1248
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 2917d58411814424e94c9fab9b03195a
+      internalID: 1699241108
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_53
+      rect:
+        serializedVersion: 2
+        x: 1272
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 3b90f2128717c704bb1b72a8de4a9f1a
+      internalID: 1041891797
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1115,6 +1262,7 @@ TextureImporter:
     nameFileIdTable:
       cards-Sheet_22: 417682171
       cards-Sheet_32: 918423874
+      cards-Sheet_48: -2003516119
       cards-Sheet_4: 913815105
       cards-Sheet_40: -519869691
       cards-Sheet_16: -1603278252
@@ -1126,6 +1274,7 @@ TextureImporter:
       cards-Sheet_2: 233344626
       cards-Sheet_9: 13255791
       cards-Sheet_41: -649580105
+      cards-Sheet_51: 1105849745
       cards-Sheet_35: -1364342487
       cards-Sheet_42: 1967540217
       cards-Sheet_23: -1581076955
@@ -1140,6 +1289,7 @@ TextureImporter:
       cards-Sheet_44: 1462713071
       cards-Sheet_18: 605110926
       cards-Sheet_30: 78745838
+      cards-Sheet_52: 1699241108
       cards-Sheet_46: -1719701330
       cards-Sheet_33: -224410000
       cards-Sheet_14: -973579807
@@ -1148,10 +1298,14 @@ TextureImporter:
       cards-Sheet_24: 1611036335
       cards-Sheet_0: -456784325
       cards-Sheet_38: -1214493470
+      cards-Sheet_49: -1883356551
       cards-Sheet_19: -1363053010
       cards-Sheet_43: 1398436475
       cards-Sheet_29: 1242150330
       cards-Sheet_34: -223813332
+      cards-Sheet_53: 1041891797
+      cards-Sheet_50: -87163637
+      cards-Sheet_47: -1819056014
       cards-Sheet_12: -1251534854
       cards-Sheet_17: -1813424044
       cards-Sheet_1: 1416325436

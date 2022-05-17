@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardID: 46
   title: Wraith
-  spr: 2
+  spr: 3
   portrait: {fileID: -1719701330, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
   ability: 16
