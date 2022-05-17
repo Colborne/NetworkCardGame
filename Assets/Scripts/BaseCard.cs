@@ -13,9 +13,15 @@ public class BaseCard : NetworkBehaviour
     public bool selected = false;
     public int cardPosition;
     public Sprite CardBack;
+    [SyncVar(hook = nameof(UpdateTimer))] public int frozenTimer;
 
     public virtual void Update()
     {
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+    }
+
+    public void UpdateTimer(int oldTime, int newTime)
+    {
+        frozenTimer = newTime;
     }
 }

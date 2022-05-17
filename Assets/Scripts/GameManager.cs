@@ -25,7 +25,7 @@ public class GameManager : MonoBehaviour
         int slot = button.GetComponent<Slot>().slotNumber;
         if(player.isOurTurn)
         {
-            if(player.currentCard.portrait == null)
+            if(player.currentCard.portrait == null && player.field[slot].frozenTimer == 0)
             {
                 player.SelectFieldCard(slot);
             }
@@ -41,7 +41,7 @@ public class GameManager : MonoBehaviour
                         player.currentCard.portrait = null;
                         player.currentCard.alreadyPlayed = false;
                     }
-                    else if(player.currentCard.cardData.fusion == player.field[slot].title)
+                    else if(player.currentCard.cardData.fusion == player.field[slot].title && player.field[slot].frozenTimer == 0)
                     {
                         player.CmdDestroyFieldCard(slot);
                         player.CmdPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
@@ -69,7 +69,7 @@ public class GameManager : MonoBehaviour
                 }
                 else
                 {
-                    if(player.sp + fieldSp >= spr)
+                    if(player.sp + fieldSp >= spr && player.field[slot].frozenTimer == 0)
                     {
                         player.CmdSetMana(-Mathf.Max(0, spr - fieldSp));
                         player.CmdDestroyFieldCard(slot);

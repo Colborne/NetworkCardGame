@@ -61,13 +61,13 @@ public class FieldCard : BaseCard
         GetComponent<Image>().sprite = portrait;
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
 
-        /*if(frozenTime > 0)
+        if(frozenTimer > 0)
             GetComponent<Image>().color = new Color32(128,255,225,255);
-        else if(rot && cardPosition == rotPosition)
+        else if(transform.parent != null && GetComponentInParent<Slot>().rot)
             GetComponent<Image>().color = new Color32(0,255,0,255);
         else
             GetComponent<Image>().color = new Color32(255,255,255,255);
-    */
+    
     }
 
     public void UseAbility(PlayerManager player, PlayerManager target)
@@ -300,7 +300,7 @@ public class FieldCard : BaseCard
             case Ability.Freeze:
                 if(target.field[cardPosition] != null)
                 {
-                    //target.field[cardPosition].frozenTime = spr / 2;
+                    target.CmdFreeze(cardPosition, spr / 2);
                     EffectSpawnSelected(player, false, false, cardPosition);
                     EffectSpawnSelected(target, true, false, cardPosition);
                     player.CmdDestroyFieldCard(cardPosition);   
@@ -309,8 +309,7 @@ public class FieldCard : BaseCard
             case Ability.Rot:
                 if(target.field[cardPosition] != null)
                 {
-                    //target.field[cardPosition].rot = true;
-                    //target.field[cardPosition].rotPosition = cardPosition;
+                    target.CmdRot(cardPosition, true);
                     EffectSpawnSelected(player, false, false, cardPosition);
                     EffectSpawnSelected(target, true, false, cardPosition);
                     player.CmdDestroyFieldCard(cardPosition);

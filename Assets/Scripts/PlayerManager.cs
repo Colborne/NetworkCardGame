@@ -176,7 +176,7 @@ public class PlayerManager : NetworkBehaviour
         int drawCount = 1;
         for(int i = 0; i < field.Length; i++)
         {
-            if(field[i] != null && field[i].ability == FieldCard.Ability.Draw)
+            if(field[i] != null && field[i].ability == FieldCard.Ability.Draw && field[i].frozenTimer == 0)
                 drawCount += field[i].spr;
             if(field[i] != null)
                 field[i].defense = 0;
@@ -207,7 +207,7 @@ public class PlayerManager : NetworkBehaviour
         {
             for(int i = 0; i < field.Length; i++)
             {
-                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount){
+                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount && field[i].frozenTimer == 0){
                     field[i].UseAbility(this, enemy);
                 }
             }
@@ -226,7 +226,13 @@ public class PlayerManager : NetworkBehaviour
         for(int i = 0; i < 5; i++)
         {
             if(field[i] != null)
-            {             
+            {      
+                if(field[i].GetComponentInParent<Slot>().rot)
+                    CmdDestroyFieldCard(i);
+                
+                if(field[i].frozenTimer > 0)
+                    CmdFreeze(i, field[i].frozenTimer - 1);
+
                 if(field[i].ability == FieldCard.Ability.Defend)
                     field[i].EffectSpawn(localPlayer);
                 
@@ -241,6 +247,11 @@ public class PlayerManager : NetworkBehaviour
 
                 if(field[i].ability == FieldCard.Ability.Freeze)
                     field[i].UseAbility(this, enemy);
+            }
+            
+            if(playerField.transform.GetChild(5).GetChild(i).GetComponent<Slot>().rot)
+            {
+                CmdRot(i, false);
             }
         }
     }
@@ -322,6 +333,38 @@ public class PlayerManager : NetworkBehaviour
         NetworkServer.Spawn(bc);
 
         if(isServer) RpcDisplayCard(bc, index);
+    }
+
+    [Command(requiresAuthority = false)] public void CmdFreeze(int index, int amount)
+    {
+        RpcFreeze(index, amount);
+    }
+
+    [ClientRpc] public void RpcFreeze(int index, int amount)
+    {
+        if(hasAuthority)
+        {
+            if(playerField.transform.GetChild(4).GetChild(index).childCount > 0)
+                playerField.transform.GetChild(4).GetChild(index).GetChild(0).GetComponent<FieldCard>().frozenTimer = amount;
+        }
+        else
+        {
+            if(enemyField.transform.GetChild(4).GetChild(index).childCount > 0)
+                enemyField.transform.GetChild(4).GetChild(index).GetChild(0).GetComponent<FieldCard>().frozenTimer = amount;
+        }
+    }
+    
+    [Command(requiresAuthority = false)] public void CmdRot(int index, bool rot)
+    {
+        RpcRot(index, rot);
+    }
+
+    [ClientRpc] public void RpcRot(int index, bool rotting)
+    {
+        if(hasAuthority)
+            playerField.transform.GetChild(4).GetChild(index).GetComponent<Slot>().rot = rotting;
+        else
+            enemyField.transform.GetChild(4).GetChild(index).GetComponent<Slot>().rot = rotting;
     }
     [Command] public void CmdLoadPlayer(string user, int health, int sum, int deck)
     {
