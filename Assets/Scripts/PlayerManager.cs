@@ -249,10 +249,7 @@ public class PlayerManager : NetworkBehaviour
                     field[i].UseAbility(this, enemy);
             }
             
-            if(playerField.transform.GetChild(5).GetChild(i).GetComponent<Slot>().rot)
-            {
-                CmdRot(i, false);
-            }
+            CmdRot(i, false);
         }
     }
     public void SelectCard(int index)
