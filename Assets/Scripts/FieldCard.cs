@@ -62,9 +62,9 @@ public class FieldCard : BaseCard
         GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
 
         if(frozenTimer > 0)
-            GetComponent<Image>().color = new Color32(128,255,225,255);
+            GetComponent<Image>().color = new Color32(200,200,225,255);
         else if(transform.parent != null && GetComponentInParent<Slot>().rot)
-            GetComponent<Image>().color = new Color32(0,255,0,255);
+            GetComponent<Image>().color = new Color32(55,150,110,255);
         else
             GetComponent<Image>().color = new Color32(255,255,255,255);
     
