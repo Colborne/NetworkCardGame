@@ -261,6 +261,7 @@ public class FieldCard : BaseCard
                 }
                 break;
             case Ability.Defend:
+                EffectSpawn(player);
                 Defend(player);
                 break;
             case Ability.DeckBurn:
@@ -451,13 +452,13 @@ public class FieldCard : BaseCard
                 if(player.field[i] != null)
                 {
                     if(i == cardPosition - 2)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                     else if(i == cardPosition - 1)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                     else if(i == cardPosition + 1)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                     else if(i == cardPosition + 2)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                 }
             }
             else if(spr == 2)
@@ -465,9 +466,9 @@ public class FieldCard : BaseCard
                 if(player.field[i] != null)
                 {
                     if(i == cardPosition - 1)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                     else if(i == cardPosition + 1)
-                        player.field[i].defense += 1;
+                        player.CmdDefense(i, 1);
                 }
             }
         }

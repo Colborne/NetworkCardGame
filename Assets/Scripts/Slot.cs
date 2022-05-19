@@ -11,13 +11,9 @@ public class Slot : MonoBehaviour
 
     private void Update() 
     {
-        if(rot){
-            //GetComponent<Image>().color = new Color32(55,150,110,255);
+        if(rot)
             GetComponent<Image>().sprite = img;
-        }
-        else{
-            //GetComponent<Image>().color = new Color32(255,255,255,255);
+        else
             GetComponent<Image>().sprite = null;
-        }
     }
 }

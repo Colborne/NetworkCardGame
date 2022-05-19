@@ -207,7 +207,7 @@ public class PlayerManager : NetworkBehaviour
         {
             for(int i = 0; i < field.Length; i++)
             {
-                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount && field[i].frozenTimer == 0){
+                if(field[i] != null && starting[i] == 1 && field[i].priority == enumCount && field[i].frozenTimer == 0 && field[i].ability != FieldCard.Ability.Defend){
                     field[i].UseAbility(this, enemy);
                 }
             }
@@ -234,7 +234,7 @@ public class PlayerManager : NetworkBehaviour
                     CmdFreeze(i, field[i].frozenTimer - 1);
 
                 if(field[i].ability == FieldCard.Ability.Defend)
-                    field[i].EffectSpawn(localPlayer);
+                    field[i].UseAbility(this, enemy);
                 
                 if(field[i].ability == FieldCard.Ability.DeckCard)
                     field[i].UseAbility(this, enemy);
@@ -350,6 +350,25 @@ public class PlayerManager : NetworkBehaviour
                 enemyField.transform.GetChild(4).GetChild(index).GetChild(0).GetComponent<FieldCard>().frozenTimer = amount;
         }
     }
+
+    [Command] public void CmdDefense(int index, int amount)
+    {
+        RpcDefense(index, amount);
+    }
+
+    [ClientRpc] public void RpcDefense(int index, int amount)
+    {
+        if(hasAuthority)
+        {
+            if(playerField.transform.GetChild(4).GetChild(index).childCount > 0)
+                playerField.transform.GetChild(4).GetChild(index).GetChild(0).GetComponent<FieldCard>().defense += amount;
+        }
+        else
+        {
+            if(enemyField.transform.GetChild(4).GetChild(index).childCount > 0)
+                enemyField.transform.GetChild(4).GetChild(index).GetChild(0).GetComponent<FieldCard>().defense += amount;
+        }
+    }
     
     [Command(requiresAuthority = false)] public void CmdRot(int index, bool rot)
     {
@@ -374,6 +393,7 @@ public class PlayerManager : NetworkBehaviour
     {
         sp += value;
     }
+    
     [ClientRpc] public void RpcDestroyHandCard(int index)
     {
         if(hasAuthority)

@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardID: 23
   title: Vampire
-  spr: 3
+  spr: 2
   portrait: {fileID: -1581076955, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
   ability: 14
