@@ -38,7 +38,11 @@ public class FieldCard : BaseCard
     }
 
     /*
-        Fix Connection boxes
+        Reshuffle,
+        ConvertHand,
+        ManaBoost
+
+        Fix Connection boxes!
         crown to 3
         mirror lightning (storm cloud)
         Reshuffle card 1 mana
