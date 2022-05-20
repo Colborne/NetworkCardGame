@@ -169,6 +169,7 @@ public class PlayerManager : NetworkBehaviour
     }
     public void NewTurn()
     {  
+        CmdUpdatePlayerText(username,hp,sp,deckSize);
         if(sp < 0)
             sp = 0;
         
@@ -247,8 +248,7 @@ public class PlayerManager : NetworkBehaviour
 
                 if(field[i].ability == FieldCard.Ability.Freeze)
                     field[i].UseAbility(this, enemy);
-            }
-            
+            }          
             CmdRot(i, false);
         }
     }
@@ -392,6 +392,11 @@ public class PlayerManager : NetworkBehaviour
     [Command] public void CmdSetMana(int value)
     {
         sp += value;
+    }
+
+    [Command] public void CmdSetHealth(int value)
+    {
+        hp += value;
     }
     
     [ClientRpc] public void RpcDestroyHandCard(int index)

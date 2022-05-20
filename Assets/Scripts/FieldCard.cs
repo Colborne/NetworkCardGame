@@ -37,6 +37,15 @@ public class FieldCard : BaseCard
         DeckCard //Happens at End of Turn
     }
 
+    /*
+        Fix Connection boxes
+        crown to 3
+        mirror lightning (storm cloud)
+        Reshuffle card 1 mana
+        Sacrifice for mana
+        Straight Discard
+    */
+
     public int[] attackPattern;
     public Ability ability;
     public GameObject effect;
@@ -331,7 +340,7 @@ public class FieldCard : BaseCard
                 player.CmdDestroyFieldCard(cardPosition);
                 break;
             case Ability.Sacrifice:
-                player.hp += spr * 2;
+                player.CmdSetHealth(spr * 2);
                 player.CmdDestroyFieldCard(cardPosition);
                 EffectSpawnSelected(player, false, false, cardPosition);
                 break;
@@ -367,7 +376,7 @@ public class FieldCard : BaseCard
         int totalDamage = 0;
         for(int i = 0; i < 5; i++)
         {  
-            if(target.field[i] != null)// && target.field[i].frozenTime == 0)
+            if(target.field[i] != null && target.field[i].frozenTimer == 0)
             {
                 int damage = 0;
                 if(cardPosition - 2 == i && actualAttack[i] > 0)
@@ -461,7 +470,7 @@ public class FieldCard : BaseCard
                         player.CmdDefense(i, 1);
                 }
             }
-            else if(spr == 2)
+            else if(spr == 3)
             {
                 if(player.field[i] != null)
                 {

@@ -90,7 +90,13 @@ public class GameManager : MonoBehaviour
         {
             player.EndTurn();
             turnManager = FindObjectOfType<TurnManager>();
-            turnManager.EndTurn(player, player.enemy);
+            StartCoroutine(EndTurn(player, player.enemy));
         }
+    }
+
+    IEnumerator EndTurn(PlayerManager player, PlayerManager enemy)
+    {
+        yield return new WaitForSeconds(.05f);
+        turnManager.EndTurn(player, enemy);
     }
 }
