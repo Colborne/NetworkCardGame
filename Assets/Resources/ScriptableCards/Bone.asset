@@ -10,14 +10,14 @@ MonoBehaviour:
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: a02dea53d35dbc5418162dbca99c526c, type: 3}
-  m_Name: Slime
+  m_Name: Bone
   m_EditorClassIdentifier: 
-  cardID: 1
-  title: Slime
+  cardID: 57
+  title: Bone
   spr: 1
-  portrait: {fileID: 1416325436, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
+  portrait: {fileID: -487277186, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
-  ability: 8
-  effect: {fileID: 6245953675364399562, guid: 32c5286efa4292e48badca74656ba65f, type: 3}
-  spawn: {fileID: 11400000, guid: 4ca2fe555ceec9a43b75aeb5a4f03ca6, type: 2}
+  ability: 25
+  effect: {fileID: 6245953675364399562, guid: c54c5bbc11e856c4ba06514d6693a555, type: 3}
+  spawn: {fileID: 11400000, guid: a5814a6647edc7541aa8fb0141f510ed, type: 2}
   fusion: Slime

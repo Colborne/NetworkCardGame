@@ -34,7 +34,11 @@ public class FieldCard : BaseCard
         Sight, //Order Doesn't Matter
         Sacrifice, //Happens During Enemy Turn
         Defend, //Happens During Enemy Turn
-        DeckCard //Happens at End of Turn
+        DeckCard, //Happens at End of Turn
+        ReturnToDeck,
+        ConvertToMana,
+        ManaBoost,
+        Luck
     }
 
     /*
@@ -43,8 +47,6 @@ public class FieldCard : BaseCard
         ManaBoost
 
         Fix Connection boxes!
-        crown to 3
-        mirror lightning (storm cloud)
         Reshuffle card 1 mana
         Sacrifice for mana
         Straight Discard
@@ -329,7 +331,6 @@ public class FieldCard : BaseCard
                 EffectSpawnSelected(target, true, false, cardPosition);
                 if (spr == 4)
                 {
-
                     if(0 <= cardPosition - 1 && cardPosition - 1 <= 4)
                     {
                         target.CmdRot(cardPosition - 1, true);
@@ -345,6 +346,39 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Sacrifice:
                 player.CmdSetHealth(spr * 2);
+                player.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(player, false, false, cardPosition);
+                break;
+            case Ability.ManaBoost:
+                player.CmdSetMana(spr * 3);
+                player.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(player, false, false, cardPosition);
+                break;
+            case Ability.ReturnToDeck:
+                for(int i = 0; i < 5; i++)
+                {
+                    if(player.hand[i] != null)
+                    {
+                        player.deck.Enqueue(player.hand[i].cardData);
+                        player.CmdDestroyHandCard(i);
+                        EffectSpawnSelected(player, false, true, i);
+                    }
+                }
+                player.CmdDestroyFieldCard(cardPosition);
+                EffectSpawnSelected(player, false, false, cardPosition);
+                break;
+            case Ability.ConvertToMana:
+                int totalMana = 0;
+                for(int i = 0; i < 5; i++)
+                {
+                    if(player.hand[i] != null)
+                    {
+                        totalMana += (player.hand[i].spr / 2);
+                        player.CmdDestroyHandCard(i);
+                        EffectSpawnSelected(player, false, true, i);
+                    }
+                }
+                player.CmdSetMana(totalMana);
                 player.CmdDestroyFieldCard(cardPosition);
                 EffectSpawnSelected(player, false, false, cardPosition);
                 break;
