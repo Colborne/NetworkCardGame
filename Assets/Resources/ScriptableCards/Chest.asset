@@ -14,7 +14,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cardID: 3
   title: Chest
-  spr: 3
+  spr: 2
   portrait: {fileID: 1912180245, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
   ability: 5
