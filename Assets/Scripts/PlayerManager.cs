@@ -248,6 +248,9 @@ public class PlayerManager : NetworkBehaviour
 
                 if(field[i].ability == FieldCard.Ability.Freeze)
                     field[i].UseAbility(this, enemy);
+
+                if(field[i].ability == FieldCard.Ability.ReturnToDeck)
+                    field[i].UseAbility(this, enemy);
             }          
             CmdRot(i, false);
         }

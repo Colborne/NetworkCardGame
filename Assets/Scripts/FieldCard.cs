@@ -347,12 +347,12 @@ public class FieldCard : BaseCard
             case Ability.Sacrifice:
                 player.CmdSetHealth(spr * 2);
                 player.CmdDestroyFieldCard(cardPosition);
-                EffectSpawnSelected(player, false, false, cardPosition);
+                EffectSpawn(player);
                 break;
             case Ability.ManaBoost:
                 player.CmdSetMana(spr * 3);
                 player.CmdDestroyFieldCard(cardPosition);
-                EffectSpawnSelected(player, false, false, cardPosition);
+                EffectSpawn(player);
                 break;
             case Ability.ReturnToDeck:
                 for(int i = 0; i < 5; i++)
@@ -361,11 +361,11 @@ public class FieldCard : BaseCard
                     {
                         player.deck.Enqueue(player.hand[i].cardData);
                         player.CmdDestroyHandCard(i);
-                        EffectSpawnSelected(player, false, true, i);
+                        ConversionEffectSpawn(player, i, 3);
                     }
                 }
                 player.CmdDestroyFieldCard(cardPosition);
-                EffectSpawnSelected(player, false, false, cardPosition);
+                EffectSpawn(player);
                 break;
             case Ability.ConvertToMana:
                 int totalMana = 0;
@@ -375,12 +375,12 @@ public class FieldCard : BaseCard
                     {
                         totalMana += (player.hand[i].spr / 2);
                         player.CmdDestroyHandCard(i);
-                        EffectSpawnSelected(player, false, true, i);
+                        ConversionEffectSpawn(player, i, 2);
                     }
                 }
                 player.CmdSetMana(totalMana);
                 player.CmdDestroyFieldCard(cardPosition);
-                EffectSpawnSelected(player, false, false, cardPosition);
+                EffectSpawn(player);
                 break;
             case Ability.Sight:
                 if(target.hand[cardPosition] != null)
@@ -608,5 +608,14 @@ public class FieldCard : BaseCard
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
         }
+    }
+
+    void ConversionEffectSpawn(PlayerManager player, int child, int target)
+    {
+        var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(child).position, Quaternion.identity);
+        eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+        eff.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(target).position;
+        eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+        //child(1) = hp, child(2) = sp, child(3) = decksize
     }
 }
