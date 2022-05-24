@@ -1417,6 +1417,27 @@ TextureImporter:
       indices: 
       edges: []
       weights: []
+    - serializedVersion: 2
+      name: cards-Sheet_62
+      rect:
+        serializedVersion: 2
+        x: 1488
+        y: 0
+        width: 24
+        height: 32
+      alignment: 0
+      pivot: {x: 0, y: 0}
+      border: {x: 0, y: 0, z: 0, w: 0}
+      outline: []
+      physicsShape: []
+      tessellationDetail: 0
+      bones: []
+      spriteID: 13efb071c06f45f46ae94f792005a5b7
+      internalID: -2012147747
+      vertices: []
+      indices: 
+      edges: []
+      weights: []
     outline: []
     physicsShape: []
     bones: []
@@ -1490,6 +1511,7 @@ TextureImporter:
       cards-Sheet_7: 576201855
       cards-Sheet_57: -487277186
       cards-Sheet_5: -293253146
+      cards-Sheet_62: -2012147747
   spritePackingTag: 
   pSDRemoveMatte: 0
   pSDShowRemoveMatteOption: 0

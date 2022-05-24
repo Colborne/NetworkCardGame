@@ -1172,7 +1172,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 1, y: 1}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -86, y: -48}
+  m_AnchoredPosition: {x: -86, y: -52}
   m_SizeDelta: {x: 200, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &145408659
@@ -1245,7 +1245,18 @@ MonoBehaviour:
 
     Chain Card
 
-    Blitz'
+    Blitz
+
+    Burn Deck
+
+    Return to
+    Deck
+
+    Summon Surge
+
+    Luck
+
+    Conversion'
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: 3a20783db51112f478b6e4c6f77c0d83, type: 2}
   m_sharedMaterial: {fileID: -3946811063640372293, guid: 3a20783db51112f478b6e4c6f77c0d83, type: 2}
@@ -1284,7 +1295,7 @@ MonoBehaviour:
   m_textAlignment: 65535
   m_characterSpacing: 0
   m_wordSpacing: 0
-  m_lineSpacing: 73
+  m_lineSpacing: 58
   m_lineSpacingMax: 0
   m_paragraphSpacing: 0
   m_charWidthMaxAdj: 0
@@ -7998,8 +8009,8 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0.5}
   m_AnchorMax: {x: 0.5, y: 0.5}
-  m_AnchoredPosition: {x: 510, y: 56}
-  m_SizeDelta: {x: 35, y: 955}
+  m_AnchoredPosition: {x: 510, y: 0}
+  m_SizeDelta: {x: 35, y: 1060}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &646951842
 MonoBehaviour:
@@ -20921,7 +20932,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 55c7da78796886746bc1567c09cf15be, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  card: {fileID: 11400000, guid: 3c8b1f15022100f45b4189da20f358f0, type: 2}
+  card: {fileID: 11400000, guid: 76b971a3fc24a07478668f37a7a39f16, type: 2}
 --- !u!114 &1740538540
 MonoBehaviour:
   m_ObjectHideFlags: 0

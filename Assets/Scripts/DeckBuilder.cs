@@ -114,42 +114,32 @@ public class DeckBuilder : MonoBehaviour
 
         BuildDeck();
 
-        //if(ipaddr.text == string.Empty)
-        //    ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
+        if(ipaddr.text == string.Empty)
+            ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
 
-        GetComponent<Canvas>().enabled = false;
         AttemptClient();
+        GetComponent<Canvas>().enabled = false;
     }
 
     public void AttemptClient()
     {
-        GameObject.Find("GameState").GetComponentInChildren<TMP_Text>().text = "Waiting for [" + manager.networkAddress + "]...";
+        if(GetComponent<Canvas>().enabled)
+            manager.networkAddress = ipaddr.text;
+        else
+           manager.networkAddress = GameObject.Find("GameState").transform.GetChild(6).GetComponent<TMP_InputField>().text;
+
         if (!NetworkClient.isConnected && !NetworkServer.active)
-        {
             ClientConnection();
-        }
 
         if (NetworkClient.isConnected && !NetworkClient.ready)
-        {
-            if (GUILayout.Button("Client Ready"))
-            {
-                NetworkClient.Ready();
-                if (NetworkClient.localPlayer == null)
-                {
-                    NetworkClient.AddPlayer();
-                    GameObject.Find("GameState").SetActive(false);
-                }
-            }
-        }
+            NetworkClient.Ready();
     }
 
     public void ClientConnection()
     {
+        GameObject.Find("GameState").GetComponentInChildren<TMP_Text>().text = "Waiting for [" + manager.networkAddress + "]...";
         if (!NetworkClient.active)
-        {
             manager.StartClient();
-        }
-        manager.networkAddress = ipaddr.text;
     }
 
     public void NewDeck()

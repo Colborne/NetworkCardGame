@@ -18,6 +18,6 @@ MonoBehaviour:
   portrait: {fileID: -487277186, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
   ability: 25
-  effect: {fileID: 6245953675364399562, guid: c54c5bbc11e856c4ba06514d6693a555, type: 3}
+  effect: {fileID: 6245953675364399562, guid: 6411b9b775de486428647d75f7e1d2df, type: 3}
   spawn: {fileID: 11400000, guid: a5814a6647edc7541aa8fb0141f510ed, type: 2}
   fusion: Slime

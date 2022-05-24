@@ -18,6 +18,6 @@ MonoBehaviour:
   portrait: {fileID: 1673954541, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
   ability: 27
-  effect: {fileID: 6245953675364399562, guid: 051d8e65cb37ded40bde6a47f0bc9ee7, type: 3}
+  effect: {fileID: 6245953675364399562, guid: 3cf1441186ba38d488e77b599432e047, type: 3}
   spawn: {fileID: 0}
   fusion: 

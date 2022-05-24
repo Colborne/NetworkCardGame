@@ -82,7 +82,6 @@ public class FieldCard : BaseCard
             GetComponent<Image>().color = new Color32(55,150,110,255);
         else
             GetComponent<Image>().color = new Color32(255,255,255,255);
-    
     }
 
     public void UseAbility(PlayerManager player, PlayerManager target)
@@ -398,6 +397,29 @@ public class FieldCard : BaseCard
                     AttackSetup(player, cardPosition, 0); 
                 }
                 break;
+            case Ability.Luck:
+                if(spr == 2)
+                {
+                    Ability[] luck = new Ability[]
+                    {
+                        Ability.Bomb, Ability.Draw, Ability.Heal, Ability.Blitz, Ability.Sacrifice, Ability.Freeze, Ability.Rot, 
+                        Ability.Rearrange, Ability.ReturnToDeck, Ability.ClearField, Ability.Swap, Ability.Sight
+                    };
+                    ability = luck[Random.Range(0,luck.Length-1)];
+                }
+                if(spr == 4)
+                {
+                    Ability[] luck = new Ability[]
+                    {
+                        Ability.Heal, Ability.Blitz, Ability.Sacrifice, Ability.Freeze, Ability.Rot, Ability.Rearrange, Ability.ReturnToDeck, Ability.ClearField, 
+                        Ability.ManaBoost, Ability.DrainLife,Ability.StealLife, Ability.DrainMana,Ability.StealMana, Ability.DeckCard, Ability.Defend
+                    };
+                    ability = luck[Random.Range(0,luck.Length-1)];
+                }
+            Debug.Log(ability);
+            UseAbility(player, target);
+            ability = Ability.Luck;
+            break;
         }
     }
 
@@ -614,7 +636,8 @@ public class FieldCard : BaseCard
     {
         var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(child).position, Quaternion.identity);
         eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
-        eff.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(target).position;
+        if(eff.GetComponent<Projectile>())
+            eff.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(target).position;
         eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         //child(1) = hp, child(2) = sp, child(3) = decksize
     }
