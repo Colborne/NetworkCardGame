@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 6d0eee1436aadad4d894f051deffa263, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will replace itself with the player's \nnext card in their
+    deck."

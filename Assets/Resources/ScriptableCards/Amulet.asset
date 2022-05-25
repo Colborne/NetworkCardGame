@@ -21,3 +21,7 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 3cf1441186ba38d488e77b599432e047, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: 'This card will destroy itself to add Summoning Points
+
+    to the
+    player triple it''s SPR.'

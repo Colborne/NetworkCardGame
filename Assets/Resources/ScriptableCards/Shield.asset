@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 958ffd3d37935b040af25bf967ffbe35, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will add defense to the card's next \nto it."

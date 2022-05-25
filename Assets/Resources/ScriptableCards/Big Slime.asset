@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 32c5286efa4292e48badca74656ba65f, type: 3}
   spawn: {fileID: 11400000}
   fusion: 
+  description: "\rThis card will duplicate itself if there is an \nopen field slot."

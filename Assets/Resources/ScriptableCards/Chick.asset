@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: b4be8b4eed05390419ca5c7439c70e34, type: 3}
   spawn: {fileID: 11400000, guid: 6a70bd89afe354843a0bec9d0540eecc, type: 2}
   fusion: 
+  description: This card will evolve into a higher level card.

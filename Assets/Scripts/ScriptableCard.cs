@@ -15,6 +15,7 @@ public class ScriptableCard : ScriptableObject
     public GameObject effect;
     public ScriptableCard spawn;
     public string fusion;
+    [Multiline] public string description;
 
     static Dictionary<int, ScriptableCard> _cache;
     public static Dictionary<int, ScriptableCard> Cache

@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 136ab2d029501bd41a10d48c55828125, type: 3}
   spawn: {fileID: 11400000, guid: f7c07361517935a4e906045f7ceb2485, type: 2}
   fusion: Bomb
+  description: "This card will steal a Health Point from the \nenemy."

@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: d476933d0933ba04c9222bd76db717f1, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will swap itself with the enemy's \ncard across from it."

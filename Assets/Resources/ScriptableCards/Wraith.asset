@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 1914048862322524236, guid: eb5b5f1476722dd44b58dd3d4e16844d, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will destroy itself and any card \ndirectly across from
+    it."

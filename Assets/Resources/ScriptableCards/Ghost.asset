@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: d0562d5063d89f14783b6235c9261671, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will directly reduce the health of \nthe enemy equal to
+    it's SPR."

@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 65f91178abcf0e8468dd810503658286, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: This card will use a random ability.

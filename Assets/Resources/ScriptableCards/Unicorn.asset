@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 1914048862322524236, guid: 3ab098b9f1e2b09418e62d8a00000442, type: 3}
   spawn: {fileID: 11400000, guid: 22dfaf87f6eaac04da6e260305638e91, type: 2}
   fusion: Knight
+  description: "This card will attack the opponent following \nthe Attack Pattern.
+    If the Attack is greater than\nthe opposing SPR, the card will be destroyed."

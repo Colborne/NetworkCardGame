@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: f609ba345564bab458631eb58dedfe42, type: 3}
   spawn: {fileID: 11400000, guid: f3e27d60435b6f747b10935de06fafa2, type: 2}
   fusion: 
+  description: "This card will spawn cards on all available \nfield slots of the
+    enemy."

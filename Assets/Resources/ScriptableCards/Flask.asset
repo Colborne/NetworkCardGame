@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: c54c5bbc11e856c4ba06514d6693a555, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "\rThis card will riase the player's Summoning \nPoints equal to it's
+    SPR."

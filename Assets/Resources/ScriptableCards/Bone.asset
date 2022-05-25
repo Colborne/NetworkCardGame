@@ -21,3 +21,6 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 6411b9b775de486428647d75f7e1d2df, type: 3}
   spawn: {fileID: 11400000, guid: a5814a6647edc7541aa8fb0141f510ed, type: 2}
   fusion: Slime
+  description: 'This card will return the player''s hand to
+
+    their deck.'

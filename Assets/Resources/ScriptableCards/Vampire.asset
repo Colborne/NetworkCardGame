@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 0de4ed415575c11499b02045d40e933c, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will directly reduce the Summoning \nPoints equal to it's
+    SPR."

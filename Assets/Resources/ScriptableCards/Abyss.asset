@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 3dff83cbcf6d40f448293e72da6afbc1, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: This card will clear both sides of the field.

@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 4545312847439962642, guid: 1a1fb9073c13c0e4b8dff838ffafc3cd, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: This card will heal the player equal to it's SPR.

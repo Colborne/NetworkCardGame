@@ -21,3 +21,9 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 2082857d7cfb5c74aa5649904b278622, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: 'This card will destroy itself to stop the card
+
+    across from it
+    from using it''s ability for a number
+
+    of turns equal to it''s SPR.'

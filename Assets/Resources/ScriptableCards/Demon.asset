@@ -21,3 +21,5 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 47d3623cef801b542b76d30ab98e291b, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will destroy all cards on the field \nand in each players'
+    hand."

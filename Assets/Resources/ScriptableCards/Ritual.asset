@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 051d8e65cb37ded40bde6a47f0bc9ee7, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will destroy itself to heal the \nplayer double it's SPR."

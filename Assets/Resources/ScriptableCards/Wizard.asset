@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: c4c52446993f6c741bb66f5d2b251748, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: This card will steal a Summoning Point from the enemy.

@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Fishing
   m_EditorClassIdentifier: 
   cardID: 53
-  title: Fishing
+  title: Fishing Rod
   spr: 3
   portrait: {fileID: 1041891797, guid: ffcf481bd98814a4f814c4c7d742c6c2, type: 3}
   attackPattern: 
@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 4545312847439962642, guid: 1a1fb9073c13c0e4b8dff838ffafc3cd, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: This card will heal the player equal to it's SPR.

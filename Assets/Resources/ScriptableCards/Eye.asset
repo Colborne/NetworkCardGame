@@ -21,3 +21,4 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: 37b4550c1a0625b41adc95a9414c8026, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: "This card will see the enemy's hand card \ndirectly in front of it."

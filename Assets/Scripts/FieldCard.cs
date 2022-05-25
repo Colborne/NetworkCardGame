@@ -545,16 +545,18 @@ public class FieldCard : BaseCard
     
     void AttackSetup(PlayerManager player, int i, int damage) 
     {
-        if(transform.parent.parent.parent == player.playerField.transform)
+        if(transform.parent != null && transform.parent.parent.parent == player.playerField.transform)
         {
             var attack = Instantiate(effect, transform.position, Quaternion.identity);
-            attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
+            if(attack.GetComponent<Projectile>())
+                attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(4).GetChild(i).position;
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
         }
-        else if(transform.parent.parent.parent == player.enemyField.transform)
+        else if(transform.parent != null && transform.parent.parent.parent == player.enemyField.transform)
         {
             var attack = Instantiate(effect, transform.position, Quaternion.identity);
-            attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(4).GetChild(i).position;
+            if(attack.GetComponent<Projectile>())
+                attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(4).GetChild(i).position;
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
         }
     }
@@ -562,16 +564,18 @@ public class FieldCard : BaseCard
     void StealEffectSpawn(PlayerManager player, int child) 
     {
         //child(1) = hp, child(2) = sp, child(3) = decksize
-        if(transform.parent.parent.parent == player.playerField.transform)
+        if(transform.parent != null && transform.parent.parent.parent == player.playerField.transform)
         {
             var attack = Instantiate(effect, player.enemyField.transform.GetChild(child).position, Quaternion.identity);
-            attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(child).position;
+            if(attack.GetComponent<Projectile>())
+                attack.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(child).position;
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
         }
-        else if(transform.parent.parent.parent == player.enemyField.transform)
+        else if(transform.parent != null && transform.parent.parent.parent == player.enemyField.transform)
         {
             var attack = Instantiate(effect, player.playerField.transform.GetChild(child).position, Quaternion.identity);
-            attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(child).position;
+            if(attack.GetComponent<Projectile>())
+                attack.GetComponent<Projectile>().destination = player.enemyField.transform.GetChild(child).position;
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
         }
     }
@@ -579,12 +583,12 @@ public class FieldCard : BaseCard
     void DrainEffectSpawn(PlayerManager player, int child) 
     {
         //child(1) = hp, child(2) = sp, child(3) = decksize
-        if(transform.parent.parent.parent == player.playerField.transform)
+        if(transform.parent != null && transform.parent.parent.parent == player.playerField.transform)
         {
             var attack = Instantiate(effect, player.enemyField.transform.GetChild(child).position, Quaternion.identity);
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 
         }
-        else if(transform.parent.parent.parent == player.enemyField.transform)
+        else if(transform.parent != null && transform.parent.parent.parent == player.enemyField.transform)
         {
             var attack = Instantiate(effect, player.playerField.transform.GetChild(child).position, Quaternion.identity);
             attack.GetComponent<RectTransform>().localScale = new Vector3(1,1,1); 

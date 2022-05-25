@@ -11,6 +11,7 @@ using System.IO;
 public class DeckBuilder : MonoBehaviour
 {
     public TMP_Text DeckSize;
+    public TMP_Text description;
     public Button[] cards;
     public List<ScriptableCard> Deck;
     public NetworkManager manager;
@@ -43,6 +44,8 @@ public class DeckBuilder : MonoBehaviour
             GameObject.Find("GameState").transform.GetChild(5).gameObject.SetActive(true);
             GameObject.Find("GameState").transform.GetChild(6).gameObject.SetActive(true);
         }
+
+        RaycastDescription();
     }
 
     public void SelectCard(TMP_Text _text)
@@ -168,5 +171,23 @@ public class DeckBuilder : MonoBehaviour
             manager.StopClient();
             AttemptClient();
         }
+    }
+
+    public void ToggleRules()
+    {
+        GameObject.Find("Rules").GetComponent<Canvas>().enabled = !GameObject.Find("Rules").GetComponent<Canvas>().enabled;
+    }
+
+    public void RaycastDescription()
+    {
+        RaycastHit2D hit = Physics2D.Raycast(Input.mousePosition, Vector2.zero);
+        
+        if(hit.collider != null)
+        {
+            description.text = hit.collider.GetComponent<CardHolder>().card.title + "\n"
+                + hit.collider.GetComponent<CardHolder>().card.description;
+        }
+        else
+            description.text = "";
     }
 }

@@ -21,3 +21,7 @@ MonoBehaviour:
   effect: {fileID: 6245953675364399562, guid: b6169691b3a901045b4d423125466f23, type: 3}
   spawn: {fileID: 0}
   fusion: 
+  description: 'This card will destroy itself to cause the
+
+    enemy''s field to
+    Rot.'
