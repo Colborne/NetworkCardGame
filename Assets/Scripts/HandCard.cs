@@ -23,7 +23,5 @@ public class HandCard : BaseCard
             portrait = cardData.image;
             GetComponent<Image>().sprite = portrait;
         }
-
-        GetComponent<RectTransform>().localScale = Vector3.one;
     }
 }

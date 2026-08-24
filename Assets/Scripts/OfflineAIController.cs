@@ -13,6 +13,7 @@ public sealed class OfflineAIController : MonoBehaviour
     private PlayerManager human;
     private TurnManager turnManager;
     private bool playingTurn;
+    private readonly bool[] lanesChangedThisTurn = new bool[SlotCount];
 
     private readonly struct PlayCandidate
     {
@@ -46,6 +47,8 @@ public sealed class OfflineAIController : MonoBehaviour
     private IEnumerator PlayTurn()
     {
         playingTurn = true;
+        for (int i = 0; i < lanesChangedThisTurn.Length; i++)
+            lanesChangedThisTurn[i] = false;
 
         while (ai && ai.isResolvingActions)
             yield return null;
@@ -104,6 +107,10 @@ public sealed class OfflineAIController : MonoBehaviour
                 FieldCard existing = ai.field[fieldIndex];
                 if (existing && existing.frozenTimer > 0)
                     continue;
+                if (existing && lanesChangedThisTurn[fieldIndex])
+                    continue;
+                if (existing && !IsStrategicReplacement(card, existing))
+                    continue;
 
                 int fieldSpirit = existing ? existing.spr : 0;
                 int manaCost = Mathf.Max(0, card.spr - fieldSpirit);
@@ -124,7 +131,16 @@ public sealed class OfflineAIController : MonoBehaviour
     {
         float score = 1.25f + card.spr * 0.7f - manaCost * 1.15f;
         if (replaced)
-            score -= EstimateBoardValue(replaced.cardData) * 0.8f;
+        {
+            float currentValue = EstimateBoardValue(replaced.cardData);
+            float improvement = EstimateBoardValue(card) - currentValue;
+            score -= currentValue * 1.15f;
+            score += improvement * 1.25f;
+        }
+        else
+        {
+            score += 2.5f;
+        }
 
         FieldCard opposingCard = human.field[slot];
         int missingHealth = Mathf.Max(0, 20 - ai.hp);
@@ -244,12 +260,24 @@ public sealed class OfflineAIController : MonoBehaviour
             return;
 
         CardInfo card = handCard.cardData;
+        FieldCard replaced = ai.field[candidate.fieldIndex];
+        if (replaced)
+            ai.RecordAction($"{ai.actionName} upgrades lane {candidate.fieldIndex + 1}, replacing <b>{replaced.title}</b> with <b>{card.title}</b>.");
+
         ai.RequestDestroyHandCard(candidate.handIndex);
         if (candidate.manaCost > 0)
             ai.RequestAdjustMana(-candidate.manaCost);
         if (ai.field[candidate.fieldIndex])
             ai.RequestDestroyFieldCard(candidate.fieldIndex);
         ai.RequestPlayCard(card, candidate.fieldIndex);
+        lanesChangedThisTurn[candidate.fieldIndex] = true;
+    }
+
+    private static bool IsStrategicReplacement(CardInfo card, FieldCard existing)
+    {
+        float currentValue = EstimateBoardValue(existing.cardData);
+        float replacementValue = EstimateBoardValue(card);
+        return replacementValue >= currentValue + 1.25f;
     }
 
     private bool TryMakeBestFusion()
@@ -295,6 +323,7 @@ public sealed class OfflineAIController : MonoBehaviour
         ai.RequestDestroyFieldCard(bestSource);
         ai.RequestDestroyFieldCard(bestTarget);
         ai.RequestPlayCard(evolvedCard, bestTarget);
+        lanesChangedThisTurn[bestTarget] = true;
         return true;
     }
 

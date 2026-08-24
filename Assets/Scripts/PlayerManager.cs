@@ -342,7 +342,7 @@ public class PlayerManager : NetworkBehaviour
                 if (field[i] && starting[i] == 1 && field[i].priority == priority &&
                     field[i].frozenTimer == 0 && field[i].ability != FieldCard.Ability.Defend)
                 {
-                    field[i].UseAbility(this, enemy);
+                    yield return field[i].UseAbility(this, enemy);
                     yield return WaitForAction();
                 }
             }
@@ -352,7 +352,7 @@ public class PlayerManager : NetworkBehaviour
         {
             if (field[i] && field[i].ability == FieldCard.Ability.Bomb)
             {
-                field[i].UseAbility(this, enemy);
+                yield return field[i].UseAbility(this, enemy);
                 yield return WaitForAction();
             }
         }
@@ -390,7 +390,7 @@ public class PlayerManager : NetworkBehaviour
                     ability == FieldCard.Ability.Sacrifice || ability == FieldCard.Ability.Blitz ||
                     ability == FieldCard.Ability.Freeze || ability == FieldCard.Ability.ReturnToDeck)
                 {
-                    field[i].UseAbility(this, enemy);
+                    yield return field[i].UseAbility(this, enemy);
                     yield return WaitForAction();
                 }
             }
@@ -419,6 +419,89 @@ public class PlayerManager : NetworkBehaviour
         isResolvingActions = true;
         yield return WaitForAction();
         isResolvingActions = false;
+    }
+
+    public IEnumerator PlayAbilityFeedback(int sourceSlot, int[] opponentSlots, int[] friendlySlots)
+    {
+        if (!IsValidSlot(sourceSlot))
+            yield break;
+
+        opponentSlots ??= Array.Empty<int>();
+        friendlySlots ??= Array.Empty<int>();
+
+        if (!IsOnline)
+        {
+            yield return AnimateAbilityFeedback(sourceSlot, opponentSlots, friendlySlots);
+            yield break;
+        }
+
+        if (isServer)
+            ObserversPlayAbilityFeedback(sourceSlot, opponentSlots, friendlySlots);
+        else
+            ServerPlayAbilityFeedback(sourceSlot, opponentSlots, friendlySlots);
+
+        yield return new WaitForSecondsRealtime(CardGameFeel.AbilityAnimationSeconds);
+    }
+
+    [ServerRpc(requireOwnership: false)]
+    private void ServerPlayAbilityFeedback(int sourceSlot, int[] opponentSlots, int[] friendlySlots)
+    {
+        ObserversPlayAbilityFeedback(sourceSlot, opponentSlots, friendlySlots);
+    }
+
+    [ObserversRpc(runLocally: true)]
+    private void ObserversPlayAbilityFeedback(int sourceSlot, int[] opponentSlots, int[] friendlySlots)
+    {
+        if (isServer && !isClient)
+            return;
+
+        StartCoroutine(AnimateAbilityFeedback(sourceSlot, opponentSlots, friendlySlots));
+    }
+
+    private IEnumerator AnimateAbilityFeedback(int sourceSlot, int[] opponentSlots, int[] friendlySlots)
+    {
+        RectTransform source = ResolveFieldVisual(false, sourceSlot);
+        if (!source)
+            yield break;
+
+        List<RectTransform> targets = new List<RectTransform>();
+        AddVisualTargets(targets, true, opponentSlots);
+        AddVisualTargets(targets, false, friendlySlots);
+        yield return CardGameFeel.AnimateAbility(source, targets);
+    }
+
+    private void AddVisualTargets(List<RectTransform> targets, bool opponent, int[] slots)
+    {
+        if (slots == null)
+            return;
+
+        for (int i = 0; i < slots.Length; i++)
+        {
+            RectTransform target = ResolveFieldVisual(opponent, slots[i]);
+            if (target)
+                targets.Add(target);
+        }
+    }
+
+    private RectTransform ResolveFieldVisual(bool opponent, int slot)
+    {
+        if (!IsValidSlot(slot))
+            return null;
+
+        ResolveSceneReferences();
+        GameObject board = opponent
+            ? (UsesLocalBoard ? enemyField : playerField)
+            : (UsesLocalBoard ? playerField : enemyField);
+        if (!board || board.transform.childCount <= 4)
+            return null;
+
+        Transform fieldRoot = board.transform.GetChild(4);
+        if (fieldRoot.childCount <= slot)
+            return null;
+
+        Transform slotTransform = fieldRoot.GetChild(slot);
+        Transform visual = slotTransform.childCount > 0 ? slotTransform.GetChild(0) : slotTransform;
+        return visual as RectTransform;
     }
 
     public void SelectCard(int index)
@@ -1004,6 +1087,7 @@ public class PlayerManager : NetworkBehaviour
         handCard.transform.SetParent(board.GetChild(5).GetChild(index), false);
         handCard.cardPosition = index;
         handCard.GetComponent<Image>().sprite = UsesLocalBoard ? handCard.portrait : handCard.CardBack;
+        StartCoroutine(CardGameFeel.AnimateReveal(handCard.GetComponent<RectTransform>()));
     }
 
     [ObserversRpc(runLocally: true)]
@@ -1026,6 +1110,7 @@ public class PlayerManager : NetworkBehaviour
         Transform board = UsesLocalBoard ? playerField.transform : enemyField.transform;
         fieldCard.transform.SetParent(board.GetChild(4).GetChild(index), false);
         fieldCard.cardPosition = index;
+        StartCoroutine(CardGameFeel.AnimateReveal(fieldCard.GetComponent<RectTransform>()));
     }
 
     [ObserversRpc(runLocally: true)]

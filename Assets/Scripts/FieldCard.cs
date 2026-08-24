@@ -73,8 +73,6 @@ public class FieldCard : BaseCard
         }
     
         GetComponent<Image>().sprite = portrait;
-        GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
-
         if(frozenTimer > 0)
             GetComponent<Image>().color = new Color32(200,200,225,255);
         else if(transform.parent != null && GetComponentInParent<Slot>().rot)
@@ -83,10 +81,13 @@ public class FieldCard : BaseCard
             GetComponent<Image>().color = new Color32(255,255,255,255);
     }
 
-    public void UseAbility(PlayerManager player, PlayerManager target)
+    public IEnumerator UseAbility(PlayerManager player, PlayerManager target)
     {
         if (player)
             player.RecordAction($"{player.actionName}'s <b>{title}</b> activates <color=#FFD56A>{ability}</color>.");
+
+        if (player)
+            yield return player.PlayAbilityFeedback(cardPosition, GetOpponentVisualSlots(target), GetFriendlyVisualSlots(player));
 
         switch(ability)
         {
@@ -116,7 +117,7 @@ public class FieldCard : BaseCard
                     if(player.field[i] == null)
                     {
                         player.RequestPlayCard(cardData, i);
-                        return;
+                        yield break;
                     }
                 }
                 break;
@@ -394,10 +395,108 @@ public class FieldCard : BaseCard
                     ability = luck[Random.Range(0,luck.Length-1)];
                 }
             Debug.Log(ability);
-            UseAbility(player, target);
+            yield return UseAbility(player, target);
             ability = Ability.Luck;
             break;
         }
+    }
+
+    private int[] GetOpponentVisualSlots(PlayerManager target)
+    {
+        List<int> slots = new List<int>();
+        switch (ability)
+        {
+            case Ability.Damage:
+                if (attackPattern != null)
+                {
+                    for (int offset = -2; offset <= 2; offset++)
+                    {
+                        int patternIndex = offset + 2;
+                        int slot = cardPosition + offset;
+                        if (patternIndex < attackPattern.Length && attackPattern[patternIndex] > 0 && slot >= 0 && slot < 5)
+                            slots.Add(slot);
+                    }
+                }
+                break;
+
+            case Ability.Swap:
+            case Ability.Freeze:
+            case Ability.Blitz:
+                AddSlot(slots, cardPosition);
+                break;
+
+            case Ability.Rot:
+                AddSlot(slots, cardPosition);
+                if (spr >= 4)
+                {
+                    AddSlot(slots, cardPosition - 1);
+                    AddSlot(slots, cardPosition + 1);
+                }
+                break;
+
+            case Ability.ClearBoard:
+            case Ability.ClearField:
+            case Ability.Rearrange:
+                AddAllSlots(slots);
+                break;
+
+            case Ability.Spawn:
+                for (int i = 0; i < 5; i++)
+                {
+                    if (target && target.field[i] == null)
+                        slots.Add(i);
+                }
+                break;
+        }
+
+        return slots.ToArray();
+    }
+
+    private int[] GetFriendlyVisualSlots(PlayerManager player)
+    {
+        List<int> slots = new List<int>();
+        switch (ability)
+        {
+            case Ability.ClearBoard:
+            case Ability.ClearField:
+                AddAllSlots(slots);
+                break;
+
+            case Ability.Defend:
+                int range = spr >= 4 ? 2 : spr == 3 ? 1 : 0;
+                for (int offset = -range; offset <= range; offset++)
+                {
+                    int slot = cardPosition + offset;
+                    if (offset != 0 && slot >= 0 && slot < 5 && player && player.field[slot])
+                        slots.Add(slot);
+                }
+                break;
+
+            case Ability.Duplicate:
+                for (int i = 0; i < 5; i++)
+                {
+                    if (player && player.field[i] == null)
+                    {
+                        slots.Add(i);
+                        break;
+                    }
+                }
+                break;
+        }
+
+        return slots.ToArray();
+    }
+
+    private static void AddAllSlots(List<int> slots)
+    {
+        for (int i = 0; i < 5; i++)
+            slots.Add(i);
+    }
+
+    private static void AddSlot(List<int> slots, int slot)
+    {
+        if (slot >= 0 && slot < 5)
+            slots.Add(slot);
     }
 
     public void Damage(PlayerManager player, PlayerManager target)
