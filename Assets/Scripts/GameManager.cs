@@ -2,7 +2,6 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
-using Mirror;
 using System.Linq;
 using System;
 
@@ -14,18 +13,22 @@ public class GameManager : MonoBehaviour
  
     public void SelectCard(Button button)
     {
-        player = PlayerManager.localPlayer;
-        if(player.isOurTurn)
+        player = PlayerManager.Local;
+        if (!player)
+            return;
+        if(player.isOurTurn && !player.isResolvingActions)
             player.SelectCard(button.GetComponent<Slot>().slotNumber);
     }
 
     public void PlayCard(Button button)
     {
-        player = PlayerManager.localPlayer;
+        player = PlayerManager.Local;
+        if (!player)
+            return;
         int slot = button.GetComponent<Slot>().slotNumber;
-        if(player.isOurTurn)
+        if(player.isOurTurn && !player.isResolvingActions)
         {
-            if(player.currentCard.portrait == null && player.field[slot].frozenTimer == 0)
+            if(player.currentCard.portrait == null && player.field[slot] != null && player.field[slot].frozenTimer == 0)
             {
                 player.SelectFieldCard(slot);
             }
@@ -35,20 +38,23 @@ public class GameManager : MonoBehaviour
                 {
                     if(player.field[slot] == null)
                     {
-                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.RequestPlayCard(player.currentCard.cardData, slot);
                         player.currentCard.GetComponent<Image>().enabled = false;
                         player.currentCard.cardData = new CardInfo();
                         player.currentCard.portrait = null;
                         player.currentCard.alreadyPlayed = false;
+                        player.PauseAfterInteraction();
                     }
                     else if(player.currentCard.cardData.fusion == player.field[slot].title && player.field[slot].frozenTimer == 0)
                     {
-                        player.CmdDestroyFieldCard(slot);
-                        player.CmdPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
+                        player.RecordAction($"{player.actionName} fuses <b>{player.currentCard.cardData.title}</b> with <b>{player.field[slot].title}</b>.");
+                        player.RequestDestroyFieldCard(slot);
+                        player.RequestPlayCard(new CardInfo(player.currentCard.cardData.spawn), slot);
                         player.currentCard.GetComponent<Image>().enabled = false;
                         player.currentCard.cardData = new CardInfo();
                         player.currentCard.portrait = null;
                         player.currentCard.alreadyPlayed = false;
+                        player.PauseAfterInteraction();
                     }
                     return;
                 }
@@ -60,23 +66,25 @@ public class GameManager : MonoBehaviour
                 {
                     if(player.sp >= spr)
                     {
-                        player.CmdSetMana(-spr);
-                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.RequestAdjustMana(-spr);
+                        player.RequestPlayCard(player.currentCard.cardData, slot);
                         player.currentCard.GetComponent<Image>().enabled = false;
                         player.currentCard.cardData = new CardInfo();
                         player.currentCard.portrait = null;
+                        player.PauseAfterInteraction();
                     }
                 }
                 else
                 {
                     if(player.sp + fieldSp >= spr && player.field[slot].frozenTimer == 0)
                     {
-                        player.CmdSetMana(-Mathf.Max(0, spr - fieldSp));
-                        player.CmdDestroyFieldCard(slot);
-                        player.CmdPlayCard(player.currentCard.cardData, slot);
+                        player.RequestAdjustMana(-Mathf.Max(0, spr - fieldSp));
+                        player.RequestDestroyFieldCard(slot);
+                        player.RequestPlayCard(player.currentCard.cardData, slot);
                         player.currentCard.GetComponent<Image>().enabled = false;
                         player.currentCard.cardData = new CardInfo();
                         player.currentCard.portrait = null;
+                        player.PauseAfterInteraction();
                     }
                 }
             }
@@ -85,18 +93,20 @@ public class GameManager : MonoBehaviour
 
     public void EndTurn()
     {
-        player = PlayerManager.localPlayer;
-        if(player.currentCard.portrait == null)
-        {
-            player.EndTurn();
-            turnManager = FindObjectOfType<TurnManager>();
+        player = PlayerManager.Local;
+        if (!player)
+            return;
+        if(player.currentCard.portrait == null && player.isOurTurn && !player.isResolvingActions)
             StartCoroutine(EndTurn(player, player.enemy));
-        }
     }
 
     IEnumerator EndTurn(PlayerManager player, PlayerManager enemy)
     {
-        yield return new WaitForSeconds(.05f);
+        yield return player.ResolveEndTurn();
+        turnManager = FindFirstObjectByType<TurnManager>();
+        if (!turnManager)
+            yield break;
+
         turnManager.EndTurn(player, enemy);
     }
 }

@@ -2,7 +2,7 @@ using System;
 using System.Net.Sockets;
 using System.Threading;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public class WebSocketClientStandAlone : SimpleWebClient
     {
@@ -11,12 +11,13 @@ namespace Mirror.SimpleWeb
         readonly TcpConfig tcpConfig;
         Connection conn;
 
-        internal WebSocketClientStandAlone(int maxMessageSize, int maxMessagesPerTick, TcpConfig tcpConfig) : base(maxMessageSize, maxMessagesPerTick)
+        internal WebSocketClientStandAlone(int maxMessageSize, int maxMessagesPerTick, TcpConfig tcpConfig,
+            bool allowSSLErrors) : base(maxMessageSize, maxMessagesPerTick)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             throw new NotSupportedException();
 #else
-            sslHelper = new ClientSslHelper();
+            sslHelper = new ClientSslHelper(allowSSLErrors);
             handshake = new ClientHandshake();
             this.tcpConfig = tcpConfig;
 #endif
@@ -27,13 +28,13 @@ namespace Mirror.SimpleWeb
             state = ClientState.Connecting;
 
             // create connection here before thread so that send queue exist before connected
-            TcpClient client = new TcpClient();
+            var client = new TcpClient();
             tcpConfig.ApplyTo(client);
 
             // create connection object here so dispose correctly disconnects on failed connect
             conn = new Connection(client, AfterConnectionDisposed);
 
-            Thread receiveThread = new Thread(() => ConnectAndReceiveLoop(serverAddress));
+            var receiveThread = new Thread(() => ConnectAndReceiveLoop(serverAddress));
             receiveThread.IsBackground = true;
             receiveThread.Start();
         }
@@ -79,9 +80,9 @@ namespace Mirror.SimpleWeb
 
                 receiveQueue.Enqueue(new Message(EventType.Connected));
 
-                Thread sendThread = new Thread(() =>
+                var sendThread = new Thread(() =>
                 {
-                    SendLoop.Config sendConfig = new SendLoop.Config(
+                    var sendConfig = new SendLoop.Config(
                         conn,
                         bufferSize: Constants.HeaderSize + Constants.MaskSize + maxMessageSize,
                         setMask: true);
@@ -93,16 +94,25 @@ namespace Mirror.SimpleWeb
                 sendThread.IsBackground = true;
                 sendThread.Start();
 
-                ReceiveLoop.Config config = new ReceiveLoop.Config(conn,
+                var config = new ReceiveLoop.Config(conn,
                     maxMessageSize,
                     false,
                     receiveQueue,
                     bufferPool);
                 ReceiveLoop.Loop(config);
             }
-            catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException e) { Log.InfoException(e); }
-            catch (Exception e) { Log.Exception(e); }
+            catch (ThreadInterruptedException e)
+            {
+                Log.InfoException(e);
+            }
+            catch (ThreadAbortException e)
+            {
+                Log.InfoException(e);
+            }
+            catch (Exception e)
+            {
+                Log.Exception(e);
+            }
             finally
             {
                 // close here in case connect fails

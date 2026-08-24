@@ -1,15 +1,22 @@
-using System.Collections;
-using System.Collections.Generic;
+using PurrNet;
 using UnityEngine;
-using Mirror;
 using UnityEngine.UI;
 
 public class HandCard : BaseCard
 {
-    [SyncVar] public bool seen;
+    private readonly SyncVar<bool> syncedSeen = new();
+
+    public bool seen => syncedSeen.value;
+
+    internal void SetSeenAuthoritative(bool value)
+    {
+        if (!isSpawned || isServer)
+            syncedSeen.value = value;
+    }
+
     public override void Update()
     {
-        if(title == "")
+        if (string.IsNullOrEmpty(title) || title != cardData.title)
         {
             title = cardData.title;
             spr = cardData.spr;
@@ -17,6 +24,6 @@ public class HandCard : BaseCard
             GetComponent<Image>().sprite = portrait;
         }
 
-        GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
+        GetComponent<RectTransform>().localScale = Vector3.one;
     }
 }

@@ -8,10 +8,9 @@ public static class SaveDeck
 {
     public static void Save(List<int> cardCounts)
     {
-        FileStream fs = new FileStream(Application.persistentDataPath + "/Deck.dat", FileMode.Create);
+        using FileStream fs = new FileStream(Application.persistentDataPath + "/Deck.dat", FileMode.Create);
         BinaryFormatter bf = new BinaryFormatter();
         bf.Serialize(fs, cardCounts);
-        fs.Close();
     }
 
     public static List<int> Load()
@@ -19,9 +18,17 @@ public static class SaveDeck
         string path = Application.persistentDataPath + "/Deck.dat";
         if(File.Exists(path))
         {
-            BinaryFormatter formatter = new BinaryFormatter();
-            FileStream stream = new FileStream(path, FileMode.Open);
-            return (List<int>)formatter.Deserialize(stream);
+            try
+            {
+                BinaryFormatter formatter = new BinaryFormatter();
+                using FileStream stream = new FileStream(path, FileMode.Open, FileAccess.Read, FileShare.Read);
+                return formatter.Deserialize(stream) as List<int>;
+            }
+            catch (System.Exception exception)
+            {
+                Debug.LogWarning($"Unable to load the saved deck. A new deck will be used instead. {exception.Message}");
+                return null;
+            }
         }
         else
             return null;

@@ -1,3 +1,4 @@
+#if PURRNET_LEGACY_MIRROR_ADAPTER
 using System;
 using System.Net;
 using System.Security.Authentication;
@@ -285,3 +286,4 @@ namespace Mirror.SimpleWeb
         #endregion
     }
 }
+#endif

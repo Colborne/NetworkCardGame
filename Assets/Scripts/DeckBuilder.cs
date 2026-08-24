@@ -4,9 +4,11 @@ using UnityEngine;
 using TMPro;
 using UnityEngine.UI;
 using System.Linq;
-using Mirror;
+using PurrNet;
+using PurrNet.Transports;
 using UnityEngine.SceneManagement;
 using System.IO;
+using System;
 
 public class DeckBuilder : MonoBehaviour
 {
@@ -15,19 +17,39 @@ public class DeckBuilder : MonoBehaviour
     public Button[] cards;
     public List<ScriptableCard> Deck;
     public NetworkManager manager;
+    [SerializeField] private PlayerManager offlinePlayerPrefab;
     public TMP_InputField ipaddr;
     public bool isHost = false;
+
+    private const int RequiredDeckSize = 40;
+    private const int MaximumCopiesPerCard = 3;
+
+    private bool offlineAIMode;
+    private PlayerManager offlineHuman;
+    private PlayerManager offlineAI;
 
     private void Awake() 
     {
         Deck = new List<ScriptableCard>();
-        manager = FindObjectOfType<NetworkManager>();
+        manager = FindFirstObjectByType<NetworkManager>();
+        // Older saves may contain fewer entries when new cards are added.
         List<int> cardCount = SaveDeck.Load();
-        if(cardCount != null)
+        if (cardCount != null)
         {
-            for(int i = 0; i < cards.Length; i++)
-                cards[i].GetComponentInChildren<TMP_Text>().text = cardCount[i].ToString();
+            for (int i = 0; i < cards.Length; i++)
+            {
+                if (!cards[i])
+                    continue;
+
+                TMP_Text countText = cards[i].GetComponentInChildren<TMP_Text>();
+                if (!countText)
+                    continue;
+
+                int savedCount = i < cardCount.Count ? cardCount[i] : 0;
+                countText.text = Mathf.Clamp(savedCount, 0, 3).ToString();
+            }
         }
+
     }
 
     private void Update() 
@@ -39,7 +61,7 @@ public class DeckBuilder : MonoBehaviour
         if(Temp.ToString() != DeckSize.text)
             DeckSize.text = "Deck: " + Temp.ToString() + "/40";
 
-        if(!GetComponent<Canvas>().enabled  && !NetworkClient.isConnected && !NetworkServer.active)
+        if(!offlineAIMode && !GetComponent<Canvas>().enabled && IsDisconnected())
         {
             GameObject.Find("GameState").transform.GetChild(5).gameObject.SetActive(true);
             GameObject.Find("GameState").transform.GetChild(6).gameObject.SetActive(true);
@@ -83,39 +105,26 @@ public class DeckBuilder : MonoBehaviour
 
     public void Host()
     {
-        int temp = 0;
-        for(int i = 0; i < cards.Length; i++)
-        {
-            for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
-            {
-                temp++;
-            }
-        }
-
-        if(temp != 40)
+        if (SelectedCardCount() != RequiredDeckSize)
             return;
 
         isHost = true;
         BuildDeck();
+        BattleLog.BeginBattle("Online Battle");
+        BattleLog.Record("Hosting a match and waiting for an opponent.");
         GetComponent<Canvas>().enabled = false;
-        manager.StartHost();
+        if (manager)
+            manager.StartHost();
     }
 
     public void Client()
     {
-        int temp = 0;
-        for(int i = 0; i < cards.Length; i++)
-        {
-            for(int j = 0; j < int.Parse(cards[i].GetComponentInChildren<TMP_Text>().text); j++)
-            {
-                temp++;
-            }
-        }
-
-        if(temp != 40)
+        if (SelectedCardCount() != RequiredDeckSize)
             return;
 
         BuildDeck();
+        BattleLog.BeginBattle("Online Battle");
+        BattleLog.Record("Connecting to the host.");
 
         if(ipaddr.text == string.Empty)
             ipaddr.text = ipaddr.placeholder.GetComponent<TMP_Text>().text;
@@ -124,33 +133,73 @@ public class DeckBuilder : MonoBehaviour
         GetComponent<Canvas>().enabled = false;
     }
 
+    public void VsAI()
+    {
+        if (SelectedCardCount() != RequiredDeckSize)
+        {
+            SetDescription("Build a 40-card deck before starting a battle.");
+            return;
+        }
+
+        if (!offlinePlayerPrefab)
+        {
+            Debug.LogError("DeckBuilder needs an offline PlayerManager prefab before Vs AI can start.", this);
+            return;
+        }
+
+        TurnManager turnManager = FindFirstObjectByType<TurnManager>();
+        if (!turnManager)
+        {
+            Debug.LogError("No TurnManager was found for the offline battle.", this);
+            return;
+        }
+
+        StopSession();
+        BuildDeck();
+
+        List<ScriptableCard> aiDeck = BuildRandomAIDeck();
+        if (aiDeck.Count != RequiredDeckSize)
+        {
+            Debug.LogError("The available card pool could not create a legal 40-card AI deck.", this);
+            return;
+        }
+
+        offlineAIMode = true;
+        GetComponent<Canvas>().enabled = false;
+        HideConnectionStatus(turnManager);
+        StartOfflineBattle(turnManager, aiDeck);
+    }
+
     public void AttemptClient()
     {
-        if(GetComponent<Canvas>().enabled)
-            manager.networkAddress = ipaddr.text;
-        else
-           manager.networkAddress = GameObject.Find("GameState").transform.GetChild(6).GetComponent<TMP_InputField>().text;
+        if (!manager)
+            return;
 
-        if (!NetworkClient.isConnected && !NetworkServer.active)
+        string address = GetComponent<Canvas>().enabled
+            ? ipaddr.text
+            : GameObject.Find("GameState").transform.GetChild(6).GetComponent<TMP_InputField>().text;
+
+        if (manager.transport is UDPTransport udpTransport)
+            udpTransport.address = address;
+
+        if (IsDisconnected())
             ClientConnection();
-
-        if (NetworkClient.isConnected && !NetworkClient.ready)
-            NetworkClient.Ready();
     }
 
     public void ClientConnection()
     {
-        GameObject.Find("GameState").GetComponentInChildren<TMP_Text>().text = "Waiting for [" + manager.networkAddress + "]...";
-        if (!NetworkClient.active)
+        if (!manager)
+            return;
+
+        string address = manager.transport is UDPTransport udpTransport ? udpTransport.address : ipaddr.text;
+        GameObject.Find("GameState").GetComponentInChildren<TMP_Text>().text = "Waiting for [" + address + "]...";
+        if (manager.clientState == ConnectionState.Disconnected)
             manager.StartClient();
     }
 
     public void NewDeck()
     {
-        if(isHost)
-            manager.StopHost();
-        else
-            manager.StopClient();
+        StopSession();
         SceneManager.LoadScene("SampleScene");
     }
 
@@ -160,17 +209,11 @@ public class DeckBuilder : MonoBehaviour
     }
 
     public void Rematch()
-    {            
-        if(isHost)
-        {
-            manager.StopHost();
-            manager.StartHost();
-        }
+    {
+        if (offlineAIMode)
+            StartCoroutine(RestartOfflineBattle());
         else
-        {
-            manager.StopClient();
-            AttemptClient();
-        }
+            StartCoroutine(RestartSession());
     }
 
     public void ToggleRules()
@@ -189,5 +232,199 @@ public class DeckBuilder : MonoBehaviour
         }
         else
             description.text = "";
+    }
+
+    private bool IsDisconnected()
+    {
+        return !manager || (manager.clientState == ConnectionState.Disconnected &&
+                            manager.serverState == ConnectionState.Disconnected);
+    }
+
+    private int SelectedCardCount()
+    {
+        int count = 0;
+        foreach (Button cardButton in cards)
+        {
+            if (!cardButton)
+                continue;
+
+            TMP_Text countText = cardButton.GetComponentInChildren<TMP_Text>();
+            if (countText && int.TryParse(countText.text, out int copies))
+                count += copies;
+        }
+
+        return count;
+    }
+
+    private List<ScriptableCard> BuildRandomAIDeck()
+    {
+        List<ScriptableCard> pool = cards
+            .Where(button => button)
+            .Select(button => button.GetComponent<CardHolder>())
+            .Where(holder => holder && holder.card)
+            .Select(holder => holder.card)
+            .GroupBy(card => card.cardID)
+            .Select(group => group.First())
+            .ToList();
+
+        List<ScriptableCard> result = new List<ScriptableCard>(RequiredDeckSize);
+        Dictionary<int, int> copies = new Dictionary<int, int>();
+
+        while (result.Count < RequiredDeckSize)
+        {
+            List<ScriptableCard> choices = pool
+                .Where(card => !copies.TryGetValue(card.cardID, out int count) || count < MaximumCopiesPerCard)
+                .ToList();
+
+            if (choices.Count == 0)
+                break;
+
+            ScriptableCard chosen = ChooseWeightedRandomCard(choices);
+            result.Add(chosen);
+            copies[chosen.cardID] = copies.TryGetValue(chosen.cardID, out int count) ? count + 1 : 1;
+        }
+
+        return result.OrderBy(_ => UnityEngine.Random.value).ToList();
+    }
+
+    private static ScriptableCard ChooseWeightedRandomCard(IReadOnlyList<ScriptableCard> choices)
+    {
+        float totalWeight = 0f;
+        for (int i = 0; i < choices.Count; i++)
+            totalWeight += DeckWeight(choices[i]);
+
+        float roll = UnityEngine.Random.value * totalWeight;
+        for (int i = 0; i < choices.Count; i++)
+        {
+            roll -= DeckWeight(choices[i]);
+            if (roll <= 0f)
+                return choices[i];
+        }
+
+        return choices[choices.Count - 1];
+    }
+
+    private static float DeckWeight(ScriptableCard card)
+    {
+        float curveWeight = card.spr switch
+        {
+            <= 1 => 1.35f,
+            2 => 1.55f,
+            3 => 1.2f,
+            4 => 0.8f,
+            _ => 0.55f
+        };
+
+        if (card.ability == FieldCard.Ability.Summoning ||
+            card.ability == FieldCard.Ability.ManaBoost ||
+            card.ability == FieldCard.Ability.Draw)
+            curveWeight *= 1.2f;
+
+        return curveWeight;
+    }
+
+    private string ResolvePlayerName()
+    {
+        TMP_InputField[] inputs = FindObjectsByType<TMP_InputField>(FindObjectsSortMode.None);
+        foreach (TMP_InputField input in inputs)
+        {
+            if (input && input.gameObject.name.IndexOf("name", StringComparison.OrdinalIgnoreCase) >= 0 &&
+                !string.IsNullOrWhiteSpace(input.text))
+                return input.text;
+        }
+
+        return "Player";
+    }
+
+    private void SetDescription(string message)
+    {
+        if (description)
+            description.text = message;
+    }
+
+    private void StopSession()
+    {
+        if (!manager)
+            return;
+
+        if (manager.clientState != ConnectionState.Disconnected)
+            manager.StopClient();
+        if (manager.serverState != ConnectionState.Disconnected)
+            manager.StopServer();
+    }
+
+    private IEnumerator RestartSession()
+    {
+        StopSession();
+        while (!IsDisconnected())
+            yield return null;
+
+        if (isHost)
+            manager.StartHost();
+        else
+            AttemptClient();
+    }
+
+    private IEnumerator RestartOfflineBattle()
+    {
+        CleanupOfflinePlayer(offlineHuman);
+        CleanupOfflinePlayer(offlineAI);
+        yield return null;
+
+        TurnManager turnManager = FindFirstObjectByType<TurnManager>();
+        if (!turnManager)
+            yield break;
+
+        Deck = Deck.OrderBy(_ => UnityEngine.Random.value).ToList();
+        List<ScriptableCard> aiDeck = BuildRandomAIDeck();
+        if (aiDeck.Count == RequiredDeckSize)
+            StartOfflineBattle(turnManager, aiDeck);
+    }
+
+    private void StartOfflineBattle(TurnManager turnManager, List<ScriptableCard> aiDeck)
+    {
+        HideConnectionStatus(turnManager);
+
+        string humanName = ResolvePlayerName();
+        BattleLog.BeginBattle($"{humanName} vs Strategist AI");
+
+        offlineHuman = UnityProxy.InstantiateDirectly(offlinePlayerPrefab);
+        offlineAI = UnityProxy.InstantiateDirectly(offlinePlayerPrefab);
+        offlineHuman.name = "Offline Human";
+        offlineAI.name = "Offline AI";
+
+        offlineHuman.InitializeOffline(humanName, Deck, true);
+        offlineAI.InitializeOffline("Strategist AI", aiDeck, false);
+        turnManager.StartOfflineBattle(offlineHuman, offlineAI);
+
+        OfflineAIController controller = offlineAI.gameObject.AddComponent<OfflineAIController>();
+        controller.Initialize(offlineAI, offlineHuman, turnManager);
+    }
+
+    private static void HideConnectionStatus(TurnManager turnManager)
+    {
+        if (!turnManager || !turnManager.canvas)
+            return;
+
+        Transform status = turnManager.canvas.transform;
+        if (status.childCount > 5)
+            status.GetChild(5).gameObject.SetActive(false);
+        if (status.childCount > 6)
+            status.GetChild(6).gameObject.SetActive(false);
+        turnManager.canvas.enabled = false;
+    }
+
+    private static void CleanupOfflinePlayer(PlayerManager player)
+    {
+        if (!player)
+            return;
+
+        for (int i = 0; i < 5; i++)
+        {
+            player.RequestDestroyHandCard(i);
+            player.RequestDestroyFieldCard(i);
+        }
+
+        UnityProxy.DestroyDirectly(player.gameObject);
     }
 }

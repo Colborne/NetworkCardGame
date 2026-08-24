@@ -1,7 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using Mirror;
 using UnityEngine.UI;
 using System.Linq;
 using TMPro;
@@ -60,7 +59,7 @@ public class FieldCard : BaseCard
     public int defense;
     public override void Update()
     {
-        if(title == "")
+        if(string.IsNullOrEmpty(title) || title != cardData.title)
         {
             title = cardData.title;
             spr = cardData.spr;
@@ -86,6 +85,9 @@ public class FieldCard : BaseCard
 
     public void UseAbility(PlayerManager player, PlayerManager target)
     {
+        if (player)
+            player.RecordAction($"{player.actionName}'s <b>{title}</b> activates <color=#FFD56A>{ability}</color>.");
+
         switch(ability)
         {
             case Ability.Draw:
@@ -93,19 +95,19 @@ public class FieldCard : BaseCard
                 break;
             case Ability.Bomb:
                 EffectSpawn(player);
-                player.hp -=spr;
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestAdjustHealth(-spr);
+                player.RequestDestroyFieldCard(cardPosition);
                 break;
             case Ability.Damage:
                 Damage(player, target);
                 break;
             case Ability.Heal:
                 EffectSpawn(player);
-                player.hp += spr;
+                player.RequestAdjustHealth(spr);
                 break;
             case Ability.Summoning:
                 EffectSpawn(player);
-                player.sp += spr;
+                player.RequestAdjustMana(spr);
                 break;
             case Ability.Duplicate:
                 EffectSpawn(player);
@@ -113,22 +115,7 @@ public class FieldCard : BaseCard
                 {
                     if(player.field[i] == null)
                     {
-                        GameObject bc = Instantiate(player.cardToSpawn);
-                        FieldCard temp = bc.GetComponent<FieldCard>();
-                        temp.cardData = new CardInfo(this.cardData.data);
-                        temp.title = this.title;
-                        temp.spr = this.spr;
-                        temp.portrait = this.portrait;
-                        temp.attackPattern = this.attackPattern;
-                        temp.ability = this.ability;
-                        temp.cardPosition = i;
-                        temp.effect = this.effect;
-                        temp.spawn = this.spawn;
-                        bc.GetComponent<Image>().sprite = temp.portrait;
-                        player.field[i] = temp;
-                        NetworkServer.Spawn(bc);
-
-                        player.RpcDisplayCard(bc, i);
+                        player.RequestPlayCard(cardData, i);
                         return;
                     }
                 }
@@ -160,8 +147,6 @@ public class FieldCard : BaseCard
                     player.field[cardPosition].spawn = trgt.spawn;
                     GetComponent<Image>().sprite = portrait;
 
-                    //player.RpcDisplayCard(target.field[cardPosition].gameObject, cardPosition);
-                    //target.RpcDisplayCard(this.gameObject, cardPosition);
                 }
                 break;
             case Ability.Evolve:
@@ -181,50 +166,50 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DrainLife:
                 DrainEffectSpawn(player, 1);
-                target.hp -= spr;
+                target.RequestAdjustHealth(-spr);
                 break;
             case Ability.StealLife:
                 StealEffectSpawn(player, 1);
                 if(target.hp >= 1)
                 {
-                    target.hp -= 1;
-                    player.hp += 1;
+                    target.RequestAdjustHealth(-1);
+                    player.RequestAdjustHealth(1);
                 }
                 break;
             case Ability.DrainMana:
                 DrainEffectSpawn(player, 2);
                 if(target.sp >= spr)
-                    target.sp -= spr; 
+                    target.RequestAdjustMana(-spr);
                 else
-                    target.sp = 0;
+                    target.RequestAdjustMana(-target.sp);
                 break;
             case Ability.StealMana:
                 StealEffectSpawn(player, 2);
                 if(target.sp >= 1)
                 {
-                    target.sp -= 1;
-                    player.sp += 1;
+                    target.RequestAdjustMana(-1);
+                    player.RequestAdjustMana(1);
                 }
                 break;
             case Ability.ClearBoard:
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    player.CmdDestroyHandCard(i);
+                    player.RequestDestroyHandCard(i);
                     EffectSpawnSelected(player, false, true, i);
-                    player.CmdDestroyFieldCard(i);
+                    player.RequestDestroyFieldCard(i);
                     EffectSpawnSelected(player, false, false, i);
-                    target.CmdDestroyHandCard(i);
+                    target.RequestDestroyHandCard(i);
                     EffectSpawnSelected(target, true, true, i);
-                    target.CmdDestroyFieldCard(i);
+                    target.RequestDestroyFieldCard(i);
                     EffectSpawnSelected(target, true, false, i);
                 }
                 break;
             case Ability.ClearField:
                 for(int i = 0; i < player.hand.Length; i++)
                 {
-                    player.CmdDestroyFieldCard(i);
+                    player.RequestDestroyFieldCard(i);
                     EffectSpawnSelected(player, false, false, i);
-                    target.CmdDestroyFieldCard(i);
+                    target.RequestDestroyFieldCard(i);
                     EffectSpawnSelected(target, true, false, i);
                 }
                 break;
@@ -234,25 +219,25 @@ public class FieldCard : BaseCard
                 if(rand == 0)
                 {
                     rand = Random.Range(0, player.hand.Length);
-                    player.CmdDestroyHandCard(rand);
+                    player.RequestDestroyHandCard(rand);
                     EffectSpawnSelected(player, false, true, rand);
                 }
                 else if(rand == 1)
                 {
                     rand = Random.Range(0, player.field.Length);
-                    player.CmdDestroyFieldCard(rand);
+                    player.RequestDestroyFieldCard(rand);
                     EffectSpawnSelected(player, false, false, rand);
                 }
                 else if(rand == 2)
                 {
                     rand = Random.Range(0, target.hand.Length);
-                    target.CmdDestroyHandCard(rand);
+                    target.RequestDestroyHandCard(rand);
                     EffectSpawnSelected(target, true, true, rand);
                 }
                 else if(rand == 3)
                 {
                     rand = Random.Range(0, target.field.Length);
-                    target.CmdDestroyFieldCard(rand);
+                    target.RequestDestroyFieldCard(rand);
                     EffectSpawnSelected(target, true, false, rand);
                 }
                 break;
@@ -261,7 +246,7 @@ public class FieldCard : BaseCard
                 {
                     if(target.field[i] == null)
                     {
-                        target.CmdPlayCard(new CardInfo(spawn), i);
+                        target.RequestPlayCard(new CardInfo(spawn), i);
                         EffectSpawnSelected(target, true, false, i);
                     }
                 }
@@ -270,8 +255,7 @@ public class FieldCard : BaseCard
                 EffectSpawn(player);
                 if(player.deckSize > 1)
                 {
-                    player.CmdPlayCard(player.deck.Dequeue(), cardPosition);
-                    Destroy(gameObject);
+                    player.RequestReplaceFieldWithDeckCard(cardPosition);
                 }
                 break;
             case Ability.Defend:
@@ -280,25 +264,20 @@ public class FieldCard : BaseCard
                 break;
             case Ability.DeckBurn:
                 DrainEffectSpawn(player, 3);
-                for(int i = 0; i < spr/2; i++)
-                {
-                    if(target.deck.Count > 0)
-                        target.deck.Dequeue();
-                }
+                target.RequestBurnDeck(spr / 2);
                 break;
             case Ability.Rearrange:
                 System.Random rng = new System.Random();
                 int[] isCard = new int[5] {0,0,0,0,0};
-                List<FieldCard> fc = new List<FieldCard>();
+                List<CardInfo> fc = new List<CardInfo>();
                
                for(int i = 0; i < 5; i++)
                 {
                     if(target.field[i] != null)
                     {
                         isCard[i] = 1;
-                        fc.Add(target.field[i]);
-                        Destroy(target.field[i].gameObject);
-                        target.field[i] = null;
+                        fc.Add(target.field[i].cardData);
+                        target.RequestDestroyFieldCard(i);
                     }
                 }
 
@@ -310,7 +289,7 @@ public class FieldCard : BaseCard
                     if(isCard[i] == 1)
                     {
                         var t = fc[Random.Range(0, fc.Count)];
-                        target.CmdPlayCard(t.cardData,i);
+                        target.RequestPlayCard(t, i);
                         fc.Remove(t);
                     }               
                 }
@@ -318,39 +297,39 @@ public class FieldCard : BaseCard
             case Ability.Freeze:
                 if(target.field[cardPosition] != null)
                 {
-                    target.CmdFreeze(cardPosition, spr);
+                    target.RequestSetFrozen(cardPosition, spr);
                     EffectSpawnSelected(player, false, false, cardPosition);
                     EffectSpawnSelected(target, true, false, cardPosition);
-                    player.CmdDestroyFieldCard(cardPosition);   
+                    player.RequestDestroyFieldCard(cardPosition);
                 }
                 break;
             case Ability.Rot:
-                target.CmdRot(cardPosition, true);
+                target.RequestSetRot(cardPosition, true);
                 EffectSpawnSelected(player, false, false, cardPosition);
                 EffectSpawnSelected(target, true, false, cardPosition);
                 if (spr == 4)
                 {
                     if(0 <= cardPosition - 1 && cardPosition - 1 <= 4)
                     {
-                        target.CmdRot(cardPosition - 1, true);
+                        target.RequestSetRot(cardPosition - 1, true);
                         EffectSpawnSelected(target, true, false, cardPosition - 1);
                     }
                     if(0 <= cardPosition + 1 && cardPosition + 1 <= 4)
                     {
-                        target.CmdRot(cardPosition + 1, true);
+                        target.RequestSetRot(cardPosition + 1, true);
                         EffectSpawnSelected(target, true, false, cardPosition + 1);
                     }
                 }
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestDestroyFieldCard(cardPosition);
                 break;
             case Ability.Sacrifice:
-                player.CmdSetHealth(spr * 2);
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestAdjustHealth(spr * 2);
+                player.RequestDestroyFieldCard(cardPosition);
                 EffectSpawn(player);
                 break;
             case Ability.ManaBoost:
-                player.CmdSetMana(spr * 3);
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestAdjustMana(spr * 3);
+                player.RequestDestroyFieldCard(cardPosition);
                 EffectSpawn(player);
                 break;
             case Ability.ReturnToDeck:
@@ -358,12 +337,11 @@ public class FieldCard : BaseCard
                 {
                     if(player.hand[i] != null)
                     {
-                        player.deck.Enqueue(player.hand[i].cardData);
-                        player.CmdDestroyHandCard(i);
+                        player.RequestReturnHandToDeck(i);
                         ConversionEffectSpawn(player, i, 3);
                     }
                 }
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestDestroyFieldCard(cardPosition);
                 EffectSpawn(player);
                 break;
             case Ability.ConvertToMana:
@@ -373,27 +351,26 @@ public class FieldCard : BaseCard
                     if(player.hand[i] != null)
                     {
                         totalMana += (player.hand[i].spr / 2);
-                        player.CmdDestroyHandCard(i);
+                        player.RequestDestroyHandCard(i);
                         ConversionEffectSpawn(player, i, 2);
                     }
                 }
-                player.CmdSetMana(totalMana);
-                player.CmdDestroyFieldCard(cardPosition);
+                player.RequestAdjustMana(totalMana);
+                player.RequestDestroyFieldCard(cardPosition);
                 EffectSpawn(player);
                 break;
             case Ability.Sight:
                 if(target.hand[cardPosition] != null)
                 {
-                    target.hand[cardPosition].GetComponent<Image>().sprite = target.hand[cardPosition].portrait; 
-                    target.hand[cardPosition].seen = true;
+                    target.RequestSetHandSeen(cardPosition, true);
                 }
                 EffectSpawn(player);
                 break;
             case Ability.Blitz:
                 if(target.field[cardPosition] != null)
                 {
-                    player.CmdDestroyFieldCard(cardPosition);
-                    target.CmdDestroyFieldCard(cardPosition);
+                    player.RequestDestroyFieldCard(cardPosition);
+                    target.RequestDestroyFieldCard(cardPosition);
                     AttackSetup(player, cardPosition, 0); 
                 }
                 break;
@@ -472,39 +449,39 @@ public class FieldCard : BaseCard
                 
                 if(damage > 0)
                 {
-                    target.hp -= damage;
-                    target.CmdDestroyFieldCard(i);
+                    target.RequestAdjustHealth(-damage);
+                    target.RequestDestroyFieldCard(i);
                 }
             }
             else
             {
                 if(cardPosition - 2 == i && actualAttack[i] > 0)
                 {
-                    target.hp -= actualAttack[i];
+                    target.RequestAdjustHealth(-actualAttack[i]);
                     totalDamage += actualAttack[i];
                     AttackSetup(player, i, actualAttack[i]);       
                 }
                 else if(cardPosition - 1 == i && actualAttack[i] > 0)
                 {
-                    target.hp -= actualAttack[i];
+                    target.RequestAdjustHealth(-actualAttack[i]);
                     totalDamage += actualAttack[i];
                     AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition == i && actualAttack[i] > 0)
                 {
-                    target.hp -= actualAttack[i];
+                    target.RequestAdjustHealth(-actualAttack[i]);
                     totalDamage += actualAttack[i];
                     AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition + 1 == i && actualAttack[i] > 0)
                 {
-                    target.hp -= actualAttack[i];
+                    target.RequestAdjustHealth(-actualAttack[i]);
                     totalDamage += actualAttack[i];
                     AttackSetup(player, i, actualAttack[i]);   
                 }
                 else if(cardPosition + 2 == i && actualAttack[i] > 0)
                 {
-                    target.hp -= actualAttack[i];
+                    target.RequestAdjustHealth(-actualAttack[i]);
                     totalDamage += actualAttack[i];
                     AttackSetup(player, i, actualAttack[i]);   
                 }
@@ -521,13 +498,13 @@ public class FieldCard : BaseCard
                 if(player.field[i] != null)
                 {
                     if(i == cardPosition - 2)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                     else if(i == cardPosition - 1)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                     else if(i == cardPosition + 1)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                     else if(i == cardPosition + 2)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                 }
             }
             else if(spr == 3)
@@ -535,9 +512,9 @@ public class FieldCard : BaseCard
                 if(player.field[i] != null)
                 {
                     if(i == cardPosition - 1)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                     else if(i == cardPosition + 1)
-                        player.CmdDefense(i, 1);
+                        player.RequestSetDefense(i, 1);
                 }
             }
         }
@@ -598,7 +575,7 @@ public class FieldCard : BaseCard
     public void EffectSpawn(PlayerManager player)
     {
         var eff = Instantiate(effect, transform.position, Quaternion.identity);
-        eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+        eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
         eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
     }
 
@@ -609,13 +586,13 @@ public class FieldCard : BaseCard
             if(isHand)
             {
                 var eff = Instantiate(effect, player.enemyField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
-                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
             else
             {
                 var eff = Instantiate(effect, player.enemyField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
-                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
         }
@@ -624,13 +601,13 @@ public class FieldCard : BaseCard
             if(isHand)
             {
                 var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(i).position, Quaternion.identity);
-                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
             else
             {
                 var eff = Instantiate(effect, player.playerField.transform.GetChild(4).GetChild(i).position, Quaternion.identity);
-                eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+                eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
                 eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);
             }
         }
@@ -639,7 +616,7 @@ public class FieldCard : BaseCard
     void ConversionEffectSpawn(PlayerManager player, int child, int target)
     {
         var eff = Instantiate(effect, player.playerField.transform.GetChild(5).GetChild(child).position, Quaternion.identity);
-        eff.GetComponent<RectTransform>().SetParent(FindObjectOfType<Canvas>().transform);
+        eff.GetComponent<RectTransform>().SetParent(FindFirstObjectByType<Canvas>().transform);
         if(eff.GetComponent<Projectile>())
             eff.GetComponent<Projectile>().destination = player.playerField.transform.GetChild(target).position;
         eff.GetComponent<RectTransform>().localScale = new Vector3(1,1,1);

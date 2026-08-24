@@ -2,7 +2,7 @@ using System;
 using System.IO;
 using System.Runtime.CompilerServices;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public static class MessageProcessor
     {
@@ -16,6 +16,7 @@ namespace Mirror.SimpleWeb
 
             return lenByte == Constants.UshortPayloadLength;
         }
+
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
         public static bool NeedToReadLongLength(byte[] buffer)
         {
@@ -48,10 +49,13 @@ namespace Mirror.SimpleWeb
             return (buffer[0] & 0b1000_0000) != 0;
         }
 
-        public static void ValidateHeader(byte[] buffer, int maxLength, bool expectMask, bool opCodeContinuation = false)
+        public static void ValidateHeader(byte[] buffer, int maxLength, bool expectMask,
+            bool opCodeContinuation = false)
         {
             bool finished = Finished(buffer);
-            bool hasMask = (buffer[1] & 0b1000_0000) != 0; // true from clients, false from server, "All messages from the client to the server have this bit set"
+            bool
+                hasMask = (buffer[1] & 0b1000_0000) !=
+                          0; // true from clients, false from server, "All messages from the client to the server have this bit set"
 
             int opcode = buffer[0] & 0b0000_1111; // expecting 1 - text message
             byte lenByte = FirstLengthByte(buffer);
@@ -66,20 +70,23 @@ namespace Mirror.SimpleWeb
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ToggleMask(byte[] src, int sourceOffset, int messageLength, byte[] maskBuffer, int maskOffset)
+        public static void ToggleMask(byte[] src, int sourceOffset, int messageLength, byte[] maskBuffer,
+            int maskOffset)
         {
             ToggleMask(src, sourceOffset, src, sourceOffset, messageLength, maskBuffer, maskOffset);
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ToggleMask(byte[] src, int sourceOffset, ArrayBuffer dst, int messageLength, byte[] maskBuffer, int maskOffset)
+        public static void ToggleMask(byte[] src, int sourceOffset, ArrayBuffer dst, int messageLength,
+            byte[] maskBuffer, int maskOffset)
         {
             ToggleMask(src, sourceOffset, dst.array, 0, messageLength, maskBuffer, maskOffset);
             dst.count = messageLength;
         }
 
         [MethodImpl(MethodImplOptions.AggressiveInlining)]
-        public static void ToggleMask(byte[] src, int srcOffset, byte[] dst, int dstOffset, int messageLength, byte[] maskBuffer, int maskOffset)
+        public static void ToggleMask(byte[] src, int srcOffset, byte[] dst, int dstOffset, int messageLength,
+            byte[] maskBuffer, int maskOffset)
         {
             for (int i = 0; i < messageLength; i++)
             {
@@ -117,6 +124,7 @@ namespace Mirror.SimpleWeb
                 {
                     throw new NotSupportedException($"Can't receive payloads larger that int.max: {int.MaxValue}");
                 }
+
                 return (int)value;
             }
             else // is less than 126
@@ -166,7 +174,7 @@ namespace Mirror.SimpleWeb
                 if (opcode == 2 || opcode == 8)
                     return;
 
-                throw new InvalidDataException("Expected opcode to be binary or close");
+                throw new InvalidDataException($"Unexpected opcode {opcode}");
             }
         }
 
@@ -182,6 +190,7 @@ namespace Mirror.SimpleWeb
         /// <summary>
         /// need to check this so that data from previous buffer isn't used
         /// </summary>
+        /// <exception cref="InvalidDataException"></exception>
         public static void ThrowIfMsgLengthTooLong(int msglen, int maxLength)
         {
             if (msglen > maxLength)

@@ -3,7 +3,7 @@ using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     /// <summary>
     /// Handles Handshakes from new clients on the server
@@ -13,9 +13,11 @@ namespace Mirror.SimpleWeb
     {
         const int GetSize = 3;
         const int ResponseLength = 129;
-        const int KeyLength = 24;
+        internal const int KeyLength = 24;
         const int MergedKeyLength = 60;
-        const string KeyHeaderString = "Sec-WebSocket-Key: ";
+
+        const string KeyHeaderString = "\r\nSec-WebSocket-Key: ";
+
         // this isn't an official max, just a reasonable size for a websocket handshake
         readonly int maxHttpHeaderSize = 3000;
 
@@ -41,16 +43,16 @@ namespace Mirror.SimpleWeb
             {
                 if (!ReadHelper.TryRead(stream, getHeader.array, 0, GetSize))
                     return false;
-                getHeader.count = GetSize;
 
+                getHeader.count = GetSize;
 
                 if (!IsGet(getHeader.array))
                 {
-                    Log.Warn($"First bytes from client was not 'GET' for handshake, instead was {Log.BufferToString(getHeader.array, 0, GetSize)}");
+                    Log.Warn(
+                        $"First bytes from client was not 'GET' for handshake, instead was {Log.BufferToString(getHeader.array, 0, GetSize)}");
                     return false;
                 }
             }
-
 
             string msg = ReadToEndForHandshake(stream);
 
@@ -60,6 +62,10 @@ namespace Mirror.SimpleWeb
             try
             {
                 AcceptHandshake(stream, msg);
+
+                conn.request = new Request(msg);
+                conn.remoteAddress = conn.CalculateAddress();
+
                 return true;
             }
             catch (ArgumentException e)
@@ -73,7 +79,8 @@ namespace Mirror.SimpleWeb
         {
             using (ArrayBuffer readBuffer = bufferPool.Take(maxHttpHeaderSize))
             {
-                int? readCountOrFail = ReadHelper.SafeReadTillMatch(stream, readBuffer.array, 0, maxHttpHeaderSize, Constants.endOfHandshake);
+                int? readCountOrFail = ReadHelper.SafeReadTillMatch(stream, readBuffer.array, 0, maxHttpHeaderSize,
+                    Constants.endOfHandshake);
                 if (!readCountOrFail.HasValue)
                     return null;
 
@@ -91,14 +98,14 @@ namespace Mirror.SimpleWeb
             // just check bytes here instead of using Encoding.ASCII
             return getHeader[0] == 71 && // G
                    getHeader[1] == 69 && // E
-                   getHeader[2] == 84;   // T
+                   getHeader[2] == 84; // T
         }
 
         void AcceptHandshake(Stream stream, string msg)
         {
             using (
                 ArrayBuffer keyBuffer = bufferPool.Take(KeyLength + Constants.HandshakeGUIDLength),
-                            responseBuffer = bufferPool.Take(ResponseLength))
+                responseBuffer = bufferPool.Take(ResponseLength))
             {
                 GetKey(msg, keyBuffer.array);
                 AppendGuid(keyBuffer.array);
@@ -109,10 +116,10 @@ namespace Mirror.SimpleWeb
             }
         }
 
-
-        static void GetKey(string msg, byte[] keyBuffer)
+        internal static void GetKey(string msg, byte[] keyBuffer)
         {
-            int start = msg.IndexOf(KeyHeaderString) + KeyHeaderString.Length;
+            int start = msg.IndexOf(KeyHeaderString, StringComparison.InvariantCultureIgnoreCase) +
+                        KeyHeaderString.Length;
 
             Log.Verbose($"Handshake Key: {msg.Substring(start, KeyLength)}");
             Encoding.ASCII.GetBytes(msg, start, KeyLength, keyBuffer, 0);
@@ -126,7 +133,6 @@ namespace Mirror.SimpleWeb
         byte[] CreateHash(byte[] keyBuffer)
         {
             Log.Verbose($"Handshake Hashing {Encoding.ASCII.GetString(keyBuffer, 0, MergedKeyLength)}");
-
             return sha1.ComputeHash(keyBuffer, 0, MergedKeyLength);
         }
 

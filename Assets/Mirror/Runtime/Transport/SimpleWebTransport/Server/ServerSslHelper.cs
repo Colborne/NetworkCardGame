@@ -5,7 +5,7 @@ using System.Net.Sockets;
 using System.Security.Authentication;
 using System.Security.Cryptography.X509Certificates;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public struct SslConfig
     {
@@ -22,6 +22,7 @@ namespace Mirror.SimpleWeb
             this.sslProtocols = sslProtocols;
         }
     }
+
     internal class ServerSslHelper
     {
         readonly SslConfig config;
@@ -59,7 +60,7 @@ namespace Mirror.SimpleWeb
 
         Stream CreateStream(NetworkStream stream)
         {
-            SslStream sslStream = new SslStream(stream, true, acceptClient);
+            var sslStream = new SslStream(stream, true, acceptClient);
             sslStream.AuthenticateAsServer(certificate, false, config.sslProtocols, false);
 
             return sslStream;

@@ -4,7 +4,7 @@ using System.Diagnostics;
 using System.Runtime.InteropServices;
 using System.Threading;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public interface IBufferOwner
     {
@@ -55,6 +55,7 @@ namespace Mirror.SimpleWeb
                 owner?.Return(this);
             }
         }
+
         public void Dispose()
         {
             Release();
@@ -63,7 +64,9 @@ namespace Mirror.SimpleWeb
 
         public void CopyTo(byte[] target, int offset)
         {
-            if (count > (target.Length + offset)) throw new ArgumentException($"{nameof(count)} was greater than {nameof(target)}.length", nameof(target));
+            if (count > (target.Length + offset))
+                throw new ArgumentException($"{nameof(count)} was greater than {nameof(target)}.length",
+                    nameof(target));
 
             Buffer.BlockCopy(array, 0, target, offset, count);
         }
@@ -75,7 +78,9 @@ namespace Mirror.SimpleWeb
 
         public void CopyFrom(byte[] source, int offset, int length)
         {
-            if (length > array.Length) throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length", nameof(length));
+            if (length > array.Length)
+                throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length",
+                    nameof(length));
 
             count = length;
             Buffer.BlockCopy(source, offset, array, 0, length);
@@ -83,7 +88,9 @@ namespace Mirror.SimpleWeb
 
         public void CopyFrom(IntPtr bufferPtr, int length)
         {
-            if (length > array.Length) throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length", nameof(length));
+            if (length > array.Length)
+                throw new ArgumentException($"{nameof(length)} was greater than {nameof(array)}.length",
+                    nameof(length));
 
             count = length;
             Marshal.Copy(bufferPtr, array, 0, length);
@@ -147,6 +154,7 @@ namespace Mirror.SimpleWeb
             int next = Interlocked.Increment(ref _current);
             Log.Verbose($"BufferBucket({arraySize}) count:{next}");
         }
+
         [Conditional("DEBUG")]
         void DecrementCreated()
         {
@@ -236,7 +244,8 @@ namespace Mirror.SimpleWeb
         {
             if (buckets[0].arraySize != smallest)
             {
-                Log.Error($"BufferPool Failed to create bucket for smallest. bucket:{buckets[0].arraySize} smallest{smallest}");
+                Log.Error(
+                    $"BufferPool Failed to create bucket for smallest. bucket:{buckets[0].arraySize} smallest{smallest}");
             }
 
             int largestBucket = buckets[bucketCount - 1].arraySize;
@@ -249,7 +258,10 @@ namespace Mirror.SimpleWeb
 
         public ArrayBuffer Take(int size)
         {
-            if (size > largest) { throw new ArgumentException($"Size ({size}) is greatest that largest ({largest})"); }
+            if (size > largest)
+            {
+                throw new ArgumentException($"Size ({size}) is greatest that largest ({largest})");
+            }
 
             for (int i = 0; i < bucketCount; i++)
             {

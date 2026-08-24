@@ -1,77 +1,148 @@
-using System.Collections;
-using System.Collections.Generic;
-using UnityEngine;
-using Mirror;
+using PurrNet;
 using TMPro;
+using UnityEngine;
 
 public class TurnManager : NetworkBehaviour
 {
-    public PlayerManager playerOne, playerTwo;
-    [SyncVar] public int whichPlayer = -1;
+    private readonly SyncVar<int> syncedWhichPlayer = new(-1);
+
+    public PlayerManager playerOne;
+    public PlayerManager playerTwo;
+    public int whichPlayer => syncedWhichPlayer.value;
     public bool needPlayers = true;
     public Canvas canvas;
-    bool gameStarted = false;
 
-    private void Update() 
+    private bool gameStarted;
+    private bool offlineBattle;
+
+    private void Update()
     {
-        if(isClientOnly && canvas.enabled && !gameStarted)
+        if (offlineBattle)
+            return;
+
+        if (!isSpawned)
+            return;
+
+        if (networkManager.isClientOnly && canvas && canvas.enabled && !gameStarted)
         {
             gameStarted = true;
             canvas.enabled = false;
         }
 
-        if(isServer && isClient && canvas.enabled && !gameStarted)
-            canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Client..."; 
-        
-        if(needPlayers)
+        if (networkManager.isHost && canvas && canvas.enabled && !gameStarted)
+            canvas.GetComponentInChildren<TMP_Text>().text = "Waiting for Client...";
+
+        if (isServer && needPlayers)
+            TryStartOnlineBattle();
+    }
+
+    private void TryStartOnlineBattle()
+    {
+        PlayerManager[] players = FindObjectsByType<PlayerManager>(FindObjectsSortMode.None);
+        PlayerManager first = null;
+        PlayerManager second = null;
+
+        foreach (PlayerManager candidate in players)
         {
-            if(PlayerManager.localPlayer != null)
+            if (!candidate.isSpawned || !candidate.isReady)
+                continue;
+
+            if (!first)
+                first = candidate;
+            else if (candidate != first)
             {
-                if(PlayerManager.localPlayer.isServer)
-                {
-                    playerOne = PlayerManager.localPlayer;
-                    if(PlayerManager.localPlayer.enemy != null)
-                    {
-                        playerTwo = PlayerManager.localPlayer.enemy;
-                        needPlayers = false;
-                        whichPlayer = 0;
-                        playerOne.isOurTurn = true;
-                        canvas.enabled = false;
-                        gameStarted = true;
-                    }
-                    else return;
-                }
+                second = candidate;
+                break;
             }
-            else return;
         }
+
+        if (!first || !second)
+            return;
+
+        playerOne = first;
+        playerTwo = second;
+        playerOne.enemy = playerTwo;
+        playerTwo.enemy = playerOne;
+        playerOne.hasEnemy = true;
+        playerTwo.hasEnemy = true;
+        playerOne.SetTurnAuthoritative(true);
+        playerTwo.SetTurnAuthoritative(false);
+        syncedWhichPlayer.value = 0;
+        needPlayers = false;
+        gameStarted = true;
+        playerOne.RecordAction($"<color=#8FD3FF><b>{playerOne.actionName} takes the first turn.</b></color>");
+        ObserversBattleStarted();
     }
 
-    [Command(requiresAuthority = false)]
-    public void CmdSetTurn(PlayerManager player)
+    public void StartOfflineBattle(PlayerManager human, PlayerManager ai)
     {
-        RpcSetTurn(player);
-    }
+        if (!human || !ai)
+            return;
 
-    [Command(requiresAuthority = false)]
-    public void CmdSetBool(PlayerManager player, bool value)
-    {
-        player.isOurTurn = value;
-    }
+        offlineBattle = true;
+        gameStarted = true;
 
-    [ClientRpc]
-    public void RpcSetTurn(PlayerManager player)
-    {
-        player.NewTurn();
+        if (canvas)
+            canvas.enabled = false;
+
+        playerOne = human;
+        playerTwo = ai;
+        playerOne.enemy = playerTwo;
+        playerTwo.enemy = playerOne;
+        playerOne.hasEnemy = true;
+        playerTwo.hasEnemy = true;
+        playerOne.SetTurnAuthoritative(true);
+        playerTwo.SetTurnAuthoritative(false);
+        if (!isSpawned || isServer)
+            syncedWhichPlayer.value = 0;
+        needPlayers = false;
+        playerOne.RecordAction($"<color=#8FD3FF><b>{playerOne.actionName} takes the first turn.</b></color>");
     }
 
     public void EndTurn(PlayerManager currentPlayer, PlayerManager target)
     {
-        CmdSetBool(currentPlayer, false);
-        CmdSetBool(target, true);
-        CmdSetTurn(currentPlayer.enemy);
-        if(whichPlayer == 0)
-            whichPlayer = 1;
-        else if(whichPlayer == 1)
-            whichPlayer = 0;
+        if (!currentPlayer || !target)
+            return;
+
+        if (offlineBattle || !isSpawned)
+            ApplyTurnChange(currentPlayer, target, false);
+        else
+            ServerEndTurn(currentPlayer, target);
+    }
+
+    [ServerRpc(requireOwnership: false)]
+    private void ServerEndTurn(PlayerManager currentPlayer, PlayerManager target)
+    {
+        if (!currentPlayer || !target || !currentPlayer.isOurTurn || currentPlayer.enemy != target)
+            return;
+
+        ApplyTurnChange(currentPlayer, target, true);
+    }
+
+    private void ApplyTurnChange(PlayerManager currentPlayer, PlayerManager target, bool notifyObservers)
+    {
+        currentPlayer.SetTurnAuthoritative(false);
+        target.SetTurnAuthoritative(true);
+        syncedWhichPlayer.value = syncedWhichPlayer.value == 0 ? 1 : 0;
+
+        if (notifyObservers)
+            ObserversBeginTurn(target);
+        else
+            target.NewTurn();
+    }
+
+    [ObserversRpc(runLocally: true)]
+    private void ObserversBattleStarted()
+    {
+        gameStarted = true;
+        if (canvas)
+            canvas.enabled = false;
+    }
+
+    [ObserversRpc(runLocally: true)]
+    private void ObserversBeginTurn(PlayerManager player)
+    {
+        if (player && player.isOwner)
+            player.NewTurn();
     }
 }

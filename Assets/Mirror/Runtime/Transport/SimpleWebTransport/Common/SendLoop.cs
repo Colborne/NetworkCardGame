@@ -5,13 +5,14 @@ using System.Security.Cryptography;
 using System.Threading;
 using UnityEngine.Profiling;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public static class SendLoopConfig
     {
         public static volatile bool batchSend = false;
         public static volatile bool sleepBeforeSend = false;
     }
+
     internal static class SendLoop
     {
         public struct Config
@@ -62,6 +63,7 @@ namespace Mirror.SimpleWeb
                     {
                         Thread.Sleep(1);
                     }
+
                     conn.sendPending.Reset();
 
                     if (SendLoopConfig.batchSend)
@@ -116,8 +118,14 @@ namespace Mirror.SimpleWeb
 
                 Log.Info($"{conn} Not Connected");
             }
-            catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException e) { Log.InfoException(e); }
+            catch (ThreadInterruptedException e)
+            {
+                Log.InfoException(e);
+            }
+            catch (ThreadAbortException e)
+            {
+                Log.InfoException(e);
+            }
             catch (Exception e)
             {
                 Log.Exception(e);
@@ -150,7 +158,8 @@ namespace Mirror.SimpleWeb
             if (setMask)
             {
                 int messageOffset = offset - msgLength;
-                MessageProcessor.ToggleMask(buffer, messageOffset, msgLength, buffer, messageOffset - Constants.MaskSize);
+                MessageProcessor.ToggleMask(buffer, messageOffset, msgLength, buffer,
+                    messageOffset - Constants.MaskSize);
             }
 
             return offset;
@@ -200,8 +209,8 @@ namespace Mirror.SimpleWeb
 
             return sendLength + startOffset;
         }
-
     }
+
     sealed class MaskHelper : IDisposable
     {
         readonly byte[] maskBuffer;
@@ -212,6 +221,7 @@ namespace Mirror.SimpleWeb
             maskBuffer = new byte[4];
             random = new RNGCryptoServiceProvider();
         }
+
         public void Dispose()
         {
             random.Dispose();

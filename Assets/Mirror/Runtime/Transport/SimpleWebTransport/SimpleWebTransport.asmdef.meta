@@ -5,3 +5,10 @@ AssemblyDefinitionImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
+AssetOrigin:
+  serializedVersion: 1
+  productId: 297320
+  packageName: 'PurrNet: Multiplayer Networking'
+  packageVersion: v1.22.1
+  assetPath: Assets/Mirror/Runtime/Transport/SimpleWebTransport/SimpleWebTransport.asmdef
+  uploadId: 974602

@@ -7,7 +7,7 @@ using System.Text;
 using System.Threading;
 using UnityEngine.Profiling;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     internal static class ReceiveLoop
     {
@@ -19,7 +19,8 @@ namespace Mirror.SimpleWeb
             public readonly ConcurrentQueue<Message> queue;
             public readonly BufferPool bufferPool;
 
-            public Config(Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool bufferPool)
+            public Config(Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue,
+                BufferPool bufferPool)
             {
                 this.conn = conn ?? throw new ArgumentNullException(nameof(conn));
                 this.maxMessageSize = maxMessageSize;
@@ -28,7 +29,8 @@ namespace Mirror.SimpleWeb
                 this.bufferPool = bufferPool ?? throw new ArgumentNullException(nameof(bufferPool));
             }
 
-            public void Deconstruct(out Connection conn, out int maxMessageSize, out bool expectMask, out ConcurrentQueue<Message> queue, out BufferPool bufferPool)
+            public void Deconstruct(out Connection conn, out int maxMessageSize, out bool expectMask,
+                out ConcurrentQueue<Message> queue, out BufferPool bufferPool)
             {
                 conn = this.conn;
                 maxMessageSize = this.maxMessageSize;
@@ -48,7 +50,8 @@ namespace Mirror.SimpleWeb
 
         public static void Loop(Config config)
         {
-            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool _) = config;
+            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool _) =
+                config;
 
             Profiler.BeginThreadProfiling("SimpleWeb", $"ReceiveLoop {conn.connId}");
 
@@ -73,9 +76,18 @@ namespace Mirror.SimpleWeb
                     throw;
                 }
             }
-            catch (ThreadInterruptedException e) { Log.InfoException(e); }
-            catch (ThreadAbortException e) { Log.InfoException(e); }
-            catch (ObjectDisposedException e) { Log.InfoException(e); }
+            catch (ThreadInterruptedException e)
+            {
+                Log.InfoException(e);
+            }
+            catch (ThreadAbortException e)
+            {
+                Log.InfoException(e);
+            }
+            catch (ObjectDisposedException e)
+            {
+                Log.InfoException(e);
+            }
             catch (ReadHelperException e)
             {
                 Log.InfoException(e);
@@ -112,7 +124,8 @@ namespace Mirror.SimpleWeb
 
         static void ReadOneMessage(Config config, byte[] buffer)
         {
-            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool bufferPool) = config;
+            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue,
+                BufferPool bufferPool) = config;
             Stream stream = conn.stream;
 
             Header header = ReadHeader(config, buffer);
@@ -135,7 +148,7 @@ namespace Mirror.SimpleWeb
             else
             {
                 // todo cache this to avoid allocations
-                Queue<ArrayBuffer> fragments = new Queue<ArrayBuffer>();
+                var fragments = new Queue<ArrayBuffer>();
                 fragments.Enqueue(CopyMessageToBuffer(bufferPool, expectMask, buffer, msgOffset, header.payloadLength));
                 int totalSize = header.payloadLength;
 
@@ -145,7 +158,8 @@ namespace Mirror.SimpleWeb
 
                     msgOffset = header.offset;
                     header.offset = ReadHelper.Read(stream, buffer, header.offset, header.payloadLength);
-                    fragments.Enqueue(CopyMessageToBuffer(bufferPool, expectMask, buffer, msgOffset, header.payloadLength));
+                    fragments.Enqueue(CopyMessageToBuffer(bufferPool, expectMask, buffer, msgOffset,
+                        header.payloadLength));
 
                     totalSize += header.payloadLength;
                     MessageProcessor.ThrowIfMsgLengthTooLong(totalSize, maxMessageSize);
@@ -173,9 +187,10 @@ namespace Mirror.SimpleWeb
 
         static Header ReadHeader(Config config, byte[] buffer, bool opCodeContinuation = false)
         {
-            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue, BufferPool bufferPool) = config;
+            (Connection conn, int maxMessageSize, bool expectMask, ConcurrentQueue<Message> queue,
+                BufferPool bufferPool) = config;
             Stream stream = conn.stream;
-            Header header = new Header();
+            var header = new Header();
 
             // read 2
             header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.HeaderMinSize);
@@ -186,6 +201,7 @@ namespace Mirror.SimpleWeb
             {
                 header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.ShortLength);
             }
+
             if (MessageProcessor.NeedToReadLongLength(buffer))
             {
                 header.offset = ReadHelper.Read(stream, buffer, header.offset, Constants.LongLength);
@@ -221,7 +237,8 @@ namespace Mirror.SimpleWeb
             queue.Enqueue(new Message(conn.connId, arrayBuffer));
         }
 
-        static ArrayBuffer CopyMessageToBuffer(BufferPool bufferPool, bool expectMask, byte[] buffer, int msgOffset, int payloadLength)
+        static ArrayBuffer CopyMessageToBuffer(BufferPool bufferPool, bool expectMask, byte[] buffer, int msgOffset,
+            int payloadLength)
         {
             ArrayBuffer arrayBuffer = bufferPool.Take(payloadLength);
 
@@ -252,7 +269,8 @@ namespace Mirror.SimpleWeb
             // dump after mask off
             Log.DumpBuffer($"Message", buffer, msgOffset, payloadLength);
 
-            Log.Info($"Close: {GetCloseCode(buffer, msgOffset)} message:{GetCloseMessage(buffer, msgOffset, payloadLength)}");
+            Log.Info(
+                $"Close: {GetCloseCode(buffer, msgOffset)} message:{GetCloseMessage(buffer, msgOffset, payloadLength)}");
 
             conn.Dispose();
         }

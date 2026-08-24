@@ -2,7 +2,7 @@ using System;
 using System.Collections.Concurrent;
 using UnityEngine;
 
-namespace Mirror.SimpleWeb
+namespace JamesFrowen.SimpleWeb
 {
     public enum ClientState
     {
@@ -11,24 +11,26 @@ namespace Mirror.SimpleWeb
         Connected = 2,
         Disconnecting = 3,
     }
+
     /// <summary>
     /// Client used to control websockets
     /// <para>Base class used by WebSocketClientWebGl and WebSocketClientStandAlone</para>
     /// </summary>
     public abstract class SimpleWebClient
     {
-        public static SimpleWebClient Create(int maxMessageSize, int maxMessagesPerTick, TcpConfig tcpConfig)
+        public static SimpleWebClient Create(int maxMessageSize, int maxMessagesPerTick, TcpConfig tcpConfig,
+            bool allowSSLErrors = false)
         {
 #if UNITY_WEBGL && !UNITY_EDITOR
             return new WebSocketClientWebGl(maxMessageSize, maxMessagesPerTick);
 #else
-            return new WebSocketClientStandAlone(maxMessageSize, maxMessagesPerTick, tcpConfig);
+            return new WebSocketClientStandAlone(maxMessageSize, maxMessagesPerTick, tcpConfig, allowSSLErrors);
 #endif
         }
 
         readonly int maxMessagesPerTick;
         protected readonly int maxMessageSize;
-        public readonly ConcurrentQueue<Message> receiveQueue = new ConcurrentQueue<Message>();
+        protected readonly ConcurrentQueue<Message> receiveQueue = new ConcurrentQueue<Message>();
         protected readonly BufferPool bufferPool;
 
         protected ClientState state;
@@ -69,7 +71,7 @@ namespace Mirror.SimpleWeb
                 processedCount < maxMessagesPerTick &&
                 // Dequeue last
                 receiveQueue.TryDequeue(out Message next)
-                )
+            )
             {
                 processedCount++;
 

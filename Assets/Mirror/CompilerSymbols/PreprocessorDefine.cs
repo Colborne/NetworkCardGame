@@ -1,3 +1,4 @@
+#if PURRNET_LEGACY_MIRROR_ADAPTER
 using System.Collections.Generic;
 using UnityEditor;
 
@@ -55,3 +56,4 @@ namespace Mirror
         }
     }
 }
+#endif
